@@ -36,6 +36,9 @@ const ALLOWED_TYPES = /jpeg|jpg|png|gif|webp|bmp|svg/;
  */
 function authenticate(req, res, next) {
   const apiKey = req.headers['x-api-key'] || req.query.key;
+  console.log('[DEBUG] received key:', JSON.stringify(apiKey));
+  console.log('[DEBUG] expected key:', JSON.stringify(SECRET_KEY));
+  console.log('[DEBUG] match:', apiKey === SECRET_KEY);
   if (apiKey !== SECRET_KEY) {
     res.status(401).json({error: 'Unauthorized'});
     return;
