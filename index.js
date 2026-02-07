@@ -101,7 +101,21 @@ app.post('/upload', authenticate, (req, res, next) => {
   });
 });
 
-// Serve uploaded images.
+// Serve raw images (used by og:image).
+app.get('/raw/:filename', (req, res) => {
+  const filePath = resolveUploadPath(req.params.filename);
+  if (!filePath) {
+    res.status(403).json({error: 'Forbidden'});
+    return;
+  }
+  if (!fs.existsSync(filePath)) {
+    res.status(404).json({error: 'File not found'});
+    return;
+  }
+  res.sendFile(filePath);
+});
+
+// Serve uploaded images with Discord embed support.
 app.get('/i/:filename', (req, res) => {
   const filePath = resolveUploadPath(req.params.filename);
   if (!filePath) {
@@ -112,6 +126,24 @@ app.get('/i/:filename', (req, res) => {
     res.status(404).json({error: 'File not found'});
     return;
   }
+
+  const ua = req.headers['user-agent'] || '';
+  if (/Discordbot/i.test(ua)) {
+    const imageUrl = `${BASE_URL}/raw/${req.params.filename}`;
+    res.setHeader('Content-Type', 'text/html');
+    res.send(`<!DOCTYPE html><html>
+<head>
+<meta property="og:type" content="website">
+<meta property="og:url" content="${BASE_URL}/i/${req.params.filename}">
+<meta property="og:image" content="${imageUrl}">
+<meta property="og:title" content="Scorpio">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${imageUrl}">
+<meta name="theme-color" content="#0a0a0a">
+</head></html>`);
+    return;
+  }
+
   res.sendFile(filePath);
 });
 
