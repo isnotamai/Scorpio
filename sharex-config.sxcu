@@ -1,11 +1,11 @@
 {
   "Version": "14.0.0",
-  "Name": "Custom Image Uploader",
+  "Name": "Scorpio Image Uploader",
   "DestinationType": "ImageUploader",
   "RequestMethod": "POST",
   "RequestURL": "http://scorpio.amai.lol/upload",
   "Headers": {
-    "X-API-Key": "ppPa%Wq%-emb4FL^>B6tX6@DcOx-Mu+NsoEN}<}@ZRUM.4r[9-KV*{A*FV*TrLt+JP.neD$V.|0ITS.l:A0Ep*dfd.1zEr4%{Xj+$nU"
+    "X-API-Key": "i-yInK-iJskYRZDQFLiQqhCHSg9PmcdT9Z8cP2Fu2gMZXuD3jgPFuXKOgxtj-cpALxp9QPpnLR51l3jv"
   },
   "Body": "MultipartFormData",
   "FileFormName": "file",

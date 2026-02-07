@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 18412;
 
 /** @const {string} */
-const SECRET_KEY = 'ppPa%Wq%-emb4FL^>B6tX6@DcOx-Mu+NsoEN}<}@ZRUM.4r[9-KV*{A*FV*TrLt+JP.neD$V.|0ITS.l:A0Ep*dfd.1zEr4%{Xj+$nU';
+const SECRET_KEY = 'i-yInK-iJskYRZDQFLiQqhCHSg9PmcdT9Z8cP2Fu2gMZXuD3jgPFuXKOgxtj-cpALxp9QPpnLR51l3jv';
 
 /** @const {string} */
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
@@ -36,9 +36,6 @@ const ALLOWED_TYPES = /jpeg|jpg|png|gif|webp|bmp|svg/;
  */
 function authenticate(req, res, next) {
   const apiKey = req.headers['x-api-key'] || req.query.key;
-  console.log('[DEBUG] received key:', JSON.stringify(apiKey));
-  console.log('[DEBUG] expected key:', JSON.stringify(SECRET_KEY));
-  console.log('[DEBUG] match:', apiKey === SECRET_KEY);
   if (apiKey !== SECRET_KEY) {
     res.status(401).json({error: 'Unauthorized'});
     return;
