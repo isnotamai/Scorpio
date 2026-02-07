@@ -1,0 +1,16 @@
+{
+  "name": "upload",
+  "version": "1.0.0",
+  "description": "Image upload server for ShareX",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "private": true,
+  "dependencies": {
+    "express": "^4.18.2",
+    "formidable": "^3.5.4",
+    "nanoid": "^3.3.7"
+  }
+}

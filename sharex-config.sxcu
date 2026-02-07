@@ -1,0 +1,14 @@
+{
+  "Version": "14.0.0",
+  "Name": "Custom Image Uploader",
+  "DestinationType": "ImageUploader",
+  "RequestMethod": "POST",
+  "RequestURL": "http://scorpio.amai.lol/upload",
+  "Headers": {
+    "X-API-Key": "ppPa%Wq%-emb4FL^>B6tX6@DcOx-Mu+NsoEN}<}@ZRUM.4r[9-KV*{A*FV*TrLt+JP.neD$V.|0ITS.l:A0Ep*dfd.1zEr4%{Xj+$nU"
+  },
+  "Body": "MultipartFormData",
+  "FileFormName": "file",
+  "URL": "{json:url}",
+  "DeletionURL": "{json:delete_url}"
+}
