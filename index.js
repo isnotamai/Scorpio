@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 18412;
 const SECRET_KEY = 'i-yInK-iJskYRZDQFLiQqhCHSg9PmcdT9Z8cP2Fu2gMZXuD3jgPFuXKOgxtj-cpALxp9QPpnLR51l3jv';
 
 /** @const {string} */
-const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+const BASE_URL = process.env.BASE_URL || `http://scorpio.amai.lol`;
 
 /** @const {string} */
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
