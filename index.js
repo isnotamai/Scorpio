@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 18412;
 
 /** @const {string} */
-const SECRET_KEY = process.env.SECRET_KEY || 'ppPa%Wq%-emb4FL^>B6tX6@DcOx-Mu+NsoEN}<}@ZRUM.4r[9-KV*{A*FV*TrLt+JP.neD$V.|0ITS.l:A0Ep*dfd.1zEr4%{Xj+$nU';
+const SECRET_KEY = 'ppPa%Wq%-emb4FL^>B6tX6@DcOx-Mu+NsoEN}<}@ZRUM.4r[9-KV*{A*FV*TrLt+JP.neD$V.|0ITS.l:A0Ep*dfd.1zEr4%{Xj+$nU';
 
 /** @const {string} */
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
