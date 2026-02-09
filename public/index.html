@@ -190,6 +190,12 @@
     .tool-card:nth-child(7) { animation-delay: .34s; }
     .tool-card:nth-child(8) { animation-delay: .38s; }
     .tool-card:nth-child(9) { animation-delay: .42s; }
+    .tool-card:nth-child(10) { animation-delay: .46s; }
+    .tool-card:nth-child(11) { animation-delay: .50s; }
+    .tool-card:nth-child(12) { animation-delay: .54s; }
+    .tool-card:nth-child(13) { animation-delay: .58s; }
+    .tool-card:nth-child(14) { animation-delay: .62s; }
+    .tool-card:nth-child(15) { animation-delay: .66s; }
 
     .tool-card:hover {
       background: #161616;
@@ -704,6 +710,11 @@
       margin-bottom: 0;
     }
 
+    /* Mono output fresh animation */
+    .mono-output.is-fresh {
+      animation: scale-in .3s ease-out;
+    }
+
     /* Toast */
     .toast {
       backdrop-filter: blur(8px);
@@ -844,6 +855,46 @@
       </svg>
       <div class="name">Word Count</div>
       <div class="desc">Characters, words &amp; lines</div>
+    </div>
+
+    <div class="tool-card" data-tool="uuid">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h6"/>
+      </svg>
+      <div class="name">UUID</div>
+      <div class="desc">Generate v4 UUIDs</div>
+    </div>
+
+    <div class="tool-card" data-tool="timestamp">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 14l2 2-2 2"/>
+      </svg>
+      <div class="name">Timestamp</div>
+      <div class="desc">Unix epoch converter</div>
+    </div>
+
+    <div class="tool-card" data-tool="lorem">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 7h16"/><path d="M4 11h16"/><path d="M4 15h12"/><path d="M4 19h8"/>
+      </svg>
+      <div class="name">Lorem Ipsum</div>
+      <div class="desc">Generate placeholder text</div>
+    </div>
+
+    <div class="tool-card" data-tool="regex">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/>
+      </svg>
+      <div class="name">Regex</div>
+      <div class="desc">Test regular expressions</div>
+    </div>
+
+    <div class="tool-card" data-tool="numbase">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M17 14v8"/><path d="M14 17h6"/>
+      </svg>
+      <div class="name">Num Base</div>
+      <div class="desc">BIN / OCT / DEC / HEX</div>
     </div>
 
   </div>
@@ -1055,6 +1106,159 @@
         <div class="stat-card"><div class="stat-value" id="wc-lines">0</div><div class="stat-label">Lines</div></div>
         <div class="stat-card"><div class="stat-value" id="wc-sentences">0</div><div class="stat-label">Sentences</div></div>
       </div>
+    </div>
+  </div>
+
+  <!-- UUID Generator -->
+  <div class="tool-panel" id="panel-uuid">
+    <div class="tool-panel-header">
+      <button class="btn-back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="tool-panel-title">UUID Generator</div>
+    </div>
+    <div class="tool-body">
+      <div class="field">
+        <label for="uuid-count">Count</label>
+        <input type="number" id="uuid-count" value="1" min="1" max="50">
+      </div>
+      <div class="checkbox-row">
+        <label><input type="checkbox" id="uuid-uppercase"> Uppercase</label>
+        <label><input type="checkbox" id="uuid-nodash"> No dashes</label>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="uuid-generate">Generate</button>
+        <button class="btn btn-secondary" id="uuid-copy">Copy</button>
+      </div>
+      <div class="field" style="margin-top: 16px">
+        <label for="uuid-output">Output</label>
+        <textarea class="mono-output" id="uuid-output" readonly></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unix Timestamp -->
+  <div class="tool-panel" id="panel-timestamp">
+    <div class="tool-panel-header">
+      <button class="btn-back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="tool-panel-title">Unix Timestamp Converter</div>
+    </div>
+    <div class="tool-body">
+      <div class="field">
+        <label>Current Time</label>
+        <div class="password-display" id="ts-live" style="font-size: 14px; letter-spacing: 0">—</div>
+      </div>
+      <div class="field">
+        <label for="ts-input">Timestamp (seconds)</label>
+        <input type="text" id="ts-input" placeholder="e.g. 1700000000">
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="ts-to-date">To Date</button>
+        <button class="btn btn-secondary" id="ts-now">Now</button>
+      </div>
+      <div class="result" id="ts-result">
+        <div class="result-value"><div class="result-label">UTC</div><span id="ts-utc"></span></div>
+        <div class="result-value"><div class="result-label">Local</div><span id="ts-local"></span></div>
+        <div class="result-value"><div class="result-label">ISO 8601</div><span id="ts-iso"></span></div>
+      </div>
+      <div style="margin-top: 20px">
+        <div class="field">
+          <label for="ts-date-input">Date &amp; Time</label>
+          <input type="datetime-local" id="ts-date-input">
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" id="ts-to-unix">To Timestamp</button>
+          <button class="btn btn-secondary" id="ts-copy-unix">Copy</button>
+        </div>
+        <div class="result" id="ts-unix-result">
+          <div class="result-value"><div class="result-label">Unix Timestamp</div><span id="ts-unix-out"></span></div>
+        </div>
+      </div>
+      <div class="status" id="ts-status"></div>
+    </div>
+  </div>
+
+  <!-- Lorem Ipsum -->
+  <div class="tool-panel" id="panel-lorem">
+    <div class="tool-panel-header">
+      <button class="btn-back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="tool-panel-title">Lorem Ipsum Generator</div>
+    </div>
+    <div class="tool-body">
+      <div class="row field">
+        <div>
+          <label for="lorem-count">Count</label>
+          <input type="number" id="lorem-count" value="3" min="1" max="50">
+        </div>
+        <div>
+          <label for="lorem-type">Type</label>
+          <select id="lorem-type">
+            <option value="paragraphs">Paragraphs</option>
+            <option value="sentences">Sentences</option>
+            <option value="words">Words</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="lorem-generate">Generate</button>
+        <button class="btn btn-secondary" id="lorem-copy">Copy</button>
+      </div>
+      <div class="field" style="margin-top: 16px">
+        <label for="lorem-output">Output</label>
+        <textarea class="mono-output" id="lorem-output" readonly style="min-height: 160px; font-family: inherit"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Regex Tester -->
+  <div class="tool-panel" id="panel-regex">
+    <div class="tool-panel-header">
+      <button class="btn-back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="tool-panel-title">Regex Tester</div>
+    </div>
+    <div class="tool-body">
+      <div class="field">
+        <label for="regex-pattern">Pattern</label>
+        <input type="text" id="regex-pattern" placeholder="e.g. \d+">
+      </div>
+      <div class="field">
+        <label for="regex-flags">Flags</label>
+        <input type="text" id="regex-flags" value="g" placeholder="e.g. gi">
+      </div>
+      <div class="field">
+        <label for="regex-input">Test String</label>
+        <textarea id="regex-input" placeholder="Enter text to test against"></textarea>
+      </div>
+      <div class="field">
+        <label>Matches</label>
+        <div class="hash-output" id="regex-output" style="display: block; min-height: 48px">No matches</div>
+      </div>
+      <div class="status" id="regex-status"></div>
+    </div>
+  </div>
+
+  <!-- Number Base Converter -->
+  <div class="tool-panel" id="panel-numbase">
+    <div class="tool-panel-header">
+      <button class="btn-back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="tool-panel-title">Number Base Converter</div>
+    </div>
+    <div class="tool-body">
+      <div class="field">
+        <label for="nb-dec">Decimal</label>
+        <input type="text" id="nb-dec" placeholder="e.g. 255" data-base="10">
+      </div>
+      <div class="field">
+        <label for="nb-hex">Hexadecimal</label>
+        <input type="text" id="nb-hex" placeholder="e.g. FF" data-base="16">
+      </div>
+      <div class="field">
+        <label for="nb-bin">Binary</label>
+        <input type="text" id="nb-bin" placeholder="e.g. 11111111" data-base="2">
+      </div>
+      <div class="field">
+        <label for="nb-oct">Octal</label>
+        <input type="text" id="nb-oct" placeholder="e.g. 377" data-base="8">
+      </div>
+      <div class="status" id="nb-status"></div>
     </div>
   </div>
 
@@ -1536,6 +1740,261 @@
     updateStat('wc-words', text.trim() ? text.trim().split(/\s+/).length : 0);
     updateStat('wc-lines', text ? text.split('\n').length : 0);
     updateStat('wc-sentences', text.trim() ? (text.match(/[.!?]+/g) || []).length : 0);
+  });
+
+  // ============================================================
+  // 10. UUID GENERATOR
+  // ============================================================
+
+  function generateUUID() {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    return hex.slice(0, 8) + '-' + hex.slice(8, 12) + '-' + hex.slice(12, 16) + '-' + hex.slice(16, 20) + '-' + hex.slice(20);
+  }
+
+  document.getElementById('uuid-generate').addEventListener('click', () => {
+    const count = Math.max(1, Math.min(50, parseInt(document.getElementById('uuid-count').value, 10) || 1));
+    const uppercase = document.getElementById('uuid-uppercase').checked;
+    const nodash = document.getElementById('uuid-nodash').checked;
+    const uuids = [];
+    for (let i = 0; i < count; i++) {
+      let id = generateUUID();
+      if (nodash) id = id.replace(/-/g, '');
+      if (uppercase) id = id.toUpperCase();
+      uuids.push(id);
+    }
+    const output = document.getElementById('uuid-output');
+    output.value = uuids.join('\n');
+    output.classList.remove('is-fresh');
+    void output.offsetWidth;
+    output.classList.add('is-fresh');
+  });
+
+  document.getElementById('uuid-copy').addEventListener('click', () => {
+    const v = document.getElementById('uuid-output').value;
+    if (v) copyText(v);
+  });
+
+  // ============================================================
+  // 11. UNIX TIMESTAMP
+  // ============================================================
+
+  // Live clock
+  let tsInterval;
+  function startTsClock() {
+    const el = document.getElementById('ts-live');
+    function tick() {
+      const now = Math.floor(Date.now() / 1000);
+      el.textContent = now + '  \u2022  ' + new Date().toISOString();
+    }
+    tick();
+    tsInterval = setInterval(tick, 1000);
+  }
+
+  // Start/stop clock when panel opens/closes
+  const tsObserver = new MutationObserver(() => {
+    const panel = document.getElementById('panel-timestamp');
+    if (panel.classList.contains('is-open')) {
+      startTsClock();
+    } else if (tsInterval) {
+      clearInterval(tsInterval);
+    }
+  });
+  tsObserver.observe(document.getElementById('panel-timestamp'), { attributes: true, attributeFilter: ['class'] });
+
+  document.getElementById('ts-to-date').addEventListener('click', () => {
+    const input = document.getElementById('ts-input').value.trim();
+    const ts = parseInt(input, 10);
+    if (isNaN(ts)) {
+      showStatus(document.getElementById('ts-status'), 'Invalid timestamp', false);
+      return;
+    }
+    // Auto-detect milliseconds vs seconds
+    const ms = input.length > 10 ? ts : ts * 1000;
+    const date = new Date(ms);
+    document.getElementById('ts-utc').textContent = date.toUTCString();
+    document.getElementById('ts-local').textContent = date.toLocaleString();
+    document.getElementById('ts-iso').textContent = date.toISOString();
+    document.getElementById('ts-result').classList.add('is-visible');
+    document.getElementById('ts-status').classList.remove('is-visible');
+  });
+
+  document.getElementById('ts-now').addEventListener('click', () => {
+    document.getElementById('ts-input').value = Math.floor(Date.now() / 1000);
+    document.getElementById('ts-to-date').click();
+  });
+
+  // Set default date-time input
+  {
+    const n = new Date();
+    document.getElementById('ts-date-input').value =
+      n.getFullYear() + '-' + pad(n.getMonth() + 1) + '-' + pad(n.getDate()) +
+      'T' + pad(n.getHours()) + ':' + pad(n.getMinutes());
+  }
+
+  document.getElementById('ts-to-unix').addEventListener('click', () => {
+    const input = document.getElementById('ts-date-input').value;
+    if (!input) return;
+    const ts = Math.floor(new Date(input).getTime() / 1000);
+    document.getElementById('ts-unix-out').textContent = ts;
+    document.getElementById('ts-unix-result').classList.add('is-visible');
+  });
+
+  document.getElementById('ts-copy-unix').addEventListener('click', () => {
+    const v = document.getElementById('ts-unix-out').textContent;
+    if (v) copyText(v);
+  });
+
+  // ============================================================
+  // 12. LOREM IPSUM
+  // ============================================================
+
+  const LOREM_WORDS = 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum'.split(' ');
+
+  function randomLoremWords(count) {
+    const result = [];
+    for (let i = 0; i < count; i++) {
+      result.push(LOREM_WORDS[Math.random() * LOREM_WORDS.length | 0]);
+    }
+    result[0] = result[0][0].toUpperCase() + result[0].slice(1);
+    return result.join(' ');
+  }
+
+  function randomLoremSentence() {
+    const len = 8 + (Math.random() * 12 | 0);
+    return randomLoremWords(len) + '.';
+  }
+
+  function randomLoremParagraph() {
+    const count = 3 + (Math.random() * 5 | 0);
+    const sentences = [];
+    for (let i = 0; i < count; i++) sentences.push(randomLoremSentence());
+    return sentences.join(' ');
+  }
+
+  document.getElementById('lorem-generate').addEventListener('click', () => {
+    const count = Math.max(1, Math.min(50, parseInt(document.getElementById('lorem-count').value, 10) || 3));
+    const type = document.getElementById('lorem-type').value;
+    let text = '';
+    if (type === 'paragraphs') {
+      const paras = [];
+      for (let i = 0; i < count; i++) paras.push(randomLoremParagraph());
+      text = paras.join('\n\n');
+    } else if (type === 'sentences') {
+      const sents = [];
+      for (let i = 0; i < count; i++) sents.push(randomLoremSentence());
+      text = sents.join(' ');
+    } else {
+      text = randomLoremWords(count) + '.';
+    }
+    document.getElementById('lorem-output').value = text;
+  });
+
+  document.getElementById('lorem-copy').addEventListener('click', () => {
+    const v = document.getElementById('lorem-output').value;
+    if (v) copyText(v);
+  });
+
+  // ============================================================
+  // 13. REGEX TESTER
+  // ============================================================
+
+  function testRegex() {
+    const patternStr = document.getElementById('regex-pattern').value;
+    const flags = document.getElementById('regex-flags').value;
+    const input = document.getElementById('regex-input').value;
+    const output = document.getElementById('regex-output');
+    const status = document.getElementById('regex-status');
+
+    if (!patternStr) {
+      output.innerHTML = '<span style="color:#555">Enter a pattern</span>';
+      status.classList.remove('is-visible');
+      return;
+    }
+
+    let regex;
+    try {
+      regex = new RegExp(patternStr, flags);
+      status.classList.remove('is-visible');
+    } catch (e) {
+      output.innerHTML = '';
+      showStatus(status, e.message, false);
+      return;
+    }
+
+    const matches = [];
+    let match;
+    if (flags.includes('g')) {
+      while ((match = regex.exec(input)) !== null) {
+        matches.push({ text: match[0], index: match.index, groups: match.slice(1) });
+        if (!match[0].length) regex.lastIndex++;
+      }
+    } else {
+      match = regex.exec(input);
+      if (match) matches.push({ text: match[0], index: match.index, groups: match.slice(1) });
+    }
+
+    if (!matches.length) {
+      output.innerHTML = '<span style="color:#555">No matches</span>';
+      return;
+    }
+
+    let html = '<div class="hash-label">' + matches.length + ' match' + (matches.length > 1 ? 'es' : '') + '</div>';
+    matches.forEach((m, i) => {
+      html += '<div class="hash-value" style="animation-delay:' + (i * .06) + 's">';
+      html += '<span style="color:#666">[' + m.index + ']</span> ';
+      html += '<span style="color:#7eb8ff">' + m.text.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>';
+      if (m.groups.length) {
+        html += ' <span style="color:#555">\u2192 groups: ' + m.groups.map((g, j) => '<span style="color:#4ade80">$' + (j + 1) + '=' + (g || '').replace(/</g, '&lt;') + '</span>').join(', ') + '</span>';
+      }
+      html += '</div>';
+    });
+    output.innerHTML = html;
+    output.classList.remove('is-fresh');
+    void output.offsetWidth;
+    output.classList.add('is-fresh');
+  }
+
+  document.getElementById('regex-pattern').addEventListener('input', testRegex);
+  document.getElementById('regex-flags').addEventListener('input', testRegex);
+  document.getElementById('regex-input').addEventListener('input', testRegex);
+
+  // ============================================================
+  // 14. NUMBER BASE CONVERTER
+  // ============================================================
+
+  const nbDec = document.getElementById('nb-dec');
+  const nbHex = document.getElementById('nb-hex');
+  const nbBin = document.getElementById('nb-bin');
+  const nbOct = document.getElementById('nb-oct');
+  const nbStatus = document.getElementById('nb-status');
+  const nbFields = [nbDec, nbHex, nbBin, nbOct];
+
+  function syncFromBase(source) {
+    const base = parseInt(source.dataset.base, 10);
+    const raw = source.value.trim();
+    if (!raw) {
+      nbFields.forEach(f => { if (f !== source) f.value = ''; });
+      nbStatus.classList.remove('is-visible');
+      return;
+    }
+    const num = parseInt(raw, base);
+    if (isNaN(num) || num < 0) {
+      showStatus(nbStatus, 'Invalid number for base ' + base, false);
+      return;
+    }
+    nbStatus.classList.remove('is-visible');
+    if (source !== nbDec) nbDec.value = num.toString(10);
+    if (source !== nbHex) nbHex.value = num.toString(16).toUpperCase();
+    if (source !== nbBin) nbBin.value = num.toString(2);
+    if (source !== nbOct) nbOct.value = num.toString(8);
+  }
+
+  nbFields.forEach(field => {
+    field.addEventListener('input', () => syncFromBase(field));
   });
 
 })();
