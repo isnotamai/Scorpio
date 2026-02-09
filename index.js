@@ -1,5 +1,6 @@
 'use strict';
 
+require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
 const {formidable} = require('formidable');
@@ -9,13 +10,13 @@ const {nanoid} = require('nanoid');
 const app = express();
 
 /** @const {number} */
-const PORT = process.env.PORT || 18412;
+const PORT = process.env.PORT;
 
 /** @const {string} */
-const SECRET_KEY = 'i-yInK-iJskYRZDQFLiQqhCHSg9PmcdT9Z8cP2Fu2gMZXuD3jgPFuXKOgxtj-cpALxp9QPpnLR51l3jv';
+const SECRET_KEY = process.env.SECRET_KEY;
 
 /** @const {string} */
-const BASE_URL = process.env.BASE_URL || `http://scorpio.amai.lol`;
+const BASE_URL = process.env.BASE_URL;
 
 /** @const {string} */
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
