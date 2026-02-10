@@ -14,6 +14,22 @@
     <h1>Scorpio</h1>
   </div>
   <div class="subtitle">amai's toolbox</div>
+
+  <!-- Auth bar -->
+  <div class="auth-bar" id="auth-bar">
+    <div class="auth-logged-out" id="auth-logged-out">
+      <button class="btn btn-sm btn-primary" id="btn-login">Login</button>
+      <button class="btn btn-sm btn-secondary" id="btn-register">Register</button>
+    </div>
+    <div class="auth-logged-in" id="auth-logged-in" style="display:none">
+      <span class="auth-user" id="auth-username"></span>
+      <span class="auth-role-badge" id="auth-role-badge"></span>
+      <span class="auth-quota" id="auth-quota"></span>
+      <button class="btn btn-sm btn-secondary" id="btn-dashboard">Dashboard</button>
+      <button class="btn btn-sm btn-secondary" id="btn-logout">Logout</button>
+    </div>
+  </div>
+
   <div class="divider"></div>
 
   <!-- Tool grid -->
@@ -497,6 +513,57 @@
     </div>
   </div>
 
+  <!-- Dashboard -->
+  <div class="tool-panel" id="panel-dashboard">
+    <div class="tool-panel-header">
+      <button class="btn-back" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="tool-panel-title">Dashboard</div>
+    </div>
+    <div class="tool-body">
+      <div class="section-header">Upload Quota</div>
+      <div class="quota-bar-container">
+        <div class="quota-bar">
+          <div class="quota-bar-fill" id="dash-quota-fill" style="width:0%"></div>
+        </div>
+        <div class="quota-text" id="dash-quota-text">0 / 10</div>
+      </div>
+
+      <div class="section-header">API Keys <button class="btn btn-sm btn-primary" id="dash-create-key">+ New Key</button></div>
+      <div id="dash-keys-list"></div>
+
+      <div class="section-header">Uploaded Files</div>
+      <div id="dash-files-list"></div>
+
+      <!-- Admin Panel (hidden for non-admins) -->
+      <div id="admin-panel" style="display:none">
+        <div class="section-header admin-header">User Management</div>
+        <div id="admin-users-list"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Auth Modal -->
+<div class="modal-overlay" id="auth-modal" style="display:none">
+  <div class="modal">
+    <button class="modal-close" id="modal-close">&times;</button>
+    <h2 class="modal-title" id="modal-title">Login</h2>
+    <div class="field">
+      <label for="auth-username-input">Username</label>
+      <input type="text" id="auth-username-input" placeholder="Enter username" autocomplete="username">
+    </div>
+    <div class="field">
+      <label for="auth-password-input">Password</label>
+      <input type="password" id="auth-password-input" placeholder="Enter password" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary" id="auth-submit" style="width:100%">Login</button>
+    <div class="status" id="auth-status"></div>
+    <div class="modal-toggle">
+      <span id="modal-toggle-text">Don't have an account?</span>
+      <a href="#" id="modal-toggle-link">Register</a>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast">Copied!</div>
