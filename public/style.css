@@ -292,8 +292,8 @@ body::after {
 
 .tool-section-grid {
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 }
 
 .tool-section-grid--featured {
@@ -348,7 +348,7 @@ body::after {
   border: 1px solid var(--border);
   border-radius: 12px;
   cursor: pointer;
-  padding: 24px 16px;
+  padding: 18px 12px;
   text-align: center;
   transition: all .3s ease;
   position: relative;
@@ -1016,7 +1016,13 @@ textarea {
   text-shadow: 0 0 8px rgba(0, 255, 136, .3);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
+  .tool-section-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 540px) {
   .topbar-inner {
     flex-wrap: wrap;
     gap: 10px;
@@ -1039,7 +1045,7 @@ textarea {
   }
 }
 
-@media (max-width: 380px) {
+@media (max-width: 360px) {
   .tool-section-grid {
     grid-template-columns: 1fr;
   }
