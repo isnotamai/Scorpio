@@ -2,7 +2,7 @@
 
 Self-hosted image upload server with a built-in developer toolbox.
 
-## Features
+## Features 
 
 **Image Upload**
 - ShareX compatible upload endpoint
