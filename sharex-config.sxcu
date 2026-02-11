@@ -3,9 +3,9 @@
   "Name": "Scorpio Image Uploader",
   "DestinationType": "ImageUploader",
   "RequestMethod": "POST",
-  "RequestURL": "http://scorpio.amai.lol/upload",
+  "RequestURL": "https://scorpio.amai.lol/upload",
   "Headers": {
-    "X-API-Key": "i-yInK-iJskYRZDQFLiQqhCHSg9PmcdT9Z8cP2Fu2gMZXuD3jgPFuXKOgxtj-cpALxp9QPpnLR51l3jv"
+    "X-API-Key": "4a4456748a3962a96b5e3d4d6ee3f951636f107f616a504e733222ec8056104d"
   },
   "Body": "MultipartFormData",
   "FileFormName": "file",

@@ -179,6 +179,8 @@
       toolGrid.style.display = '';
       toolGrid.style.opacity = '';
       toolGrid.style.transform = '';
+      const ft = document.getElementById('app-footer');
+      if (ft) ft.style.display = '';
     }
     showToast('Logged out');
   });
@@ -186,6 +188,7 @@
   // -- Navigation --
 
   const toolGrid = document.getElementById('tool-grid');
+  const appFooter = document.getElementById('app-footer');
 
   function openPanel(panelId) {
     toolGrid.style.opacity = '0';
@@ -193,6 +196,7 @@
     toolGrid.style.transition = 'opacity .15s, transform .15s';
     setTimeout(() => {
       toolGrid.style.display = 'none';
+      if (appFooter) appFooter.style.display = 'none';
       document.querySelectorAll('.tool-panel').forEach((p) => p.classList.remove('is-open'));
       const panel = document.getElementById(panelId);
       if (panel) panel.classList.add('is-open');
@@ -218,11 +222,12 @@
           toolGrid.style.display = '';
           toolGrid.style.opacity = '';
           toolGrid.style.transform = '';
-          // Re-trigger card animations
-          toolGrid.querySelectorAll('.tool-card').forEach((c) => {
-            c.style.animation = 'none';
-            void c.offsetWidth;
-            c.style.animation = '';
+          if (appFooter) appFooter.style.display = '';
+          // Re-trigger section animations
+          toolGrid.querySelectorAll('.tool-section').forEach((s) => {
+            s.style.animation = 'none';
+            void s.offsetWidth;
+            s.style.animation = '';
           });
         }, 150);
       }

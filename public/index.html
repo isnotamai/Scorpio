@@ -7,152 +7,200 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+
+<!-- Top navigation bar -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-brand">
+      <img class="logo" src="/logo.png" alt="Scorpio">
+      <h1>Scorpio</h1>
+      <span class="topbar-tag">TOOLBOX</span>
+    </div>
+    <div class="topbar-auth" id="auth-bar">
+      <div class="auth-logged-out" id="auth-logged-out">
+        <button class="btn btn-sm btn-secondary" id="btn-login">Login</button>
+        <button class="btn btn-sm btn-primary" id="btn-register">Register</button>
+      </div>
+      <div class="auth-logged-in" id="auth-logged-in" style="display:none">
+        <span class="auth-user" id="auth-username"></span>
+        <span class="auth-role-badge" id="auth-role-badge"></span>
+        <span class="auth-quota" id="auth-quota"></span>
+        <button class="btn btn-sm btn-secondary" id="btn-dashboard">Dashboard</button>
+        <button class="btn btn-sm btn-secondary" id="btn-logout">Logout</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
 <div class="app">
 
-  <div class="header">
-    <img class="logo" src="/logo.png" alt="Scorpio">
-    <h1>Scorpio</h1>
-  </div>
-  <div class="subtitle">amai's toolbox</div>
-
-  <!-- Auth bar -->
-  <div class="auth-bar" id="auth-bar">
-    <div class="auth-logged-out" id="auth-logged-out">
-      <button class="btn btn-sm btn-primary" id="btn-login">Login</button>
-      <button class="btn btn-sm btn-secondary" id="btn-register">Register</button>
-    </div>
-    <div class="auth-logged-in" id="auth-logged-in" style="display:none">
-      <span class="auth-user" id="auth-username"></span>
-      <span class="auth-role-badge" id="auth-role-badge"></span>
-      <span class="auth-quota" id="auth-quota"></span>
-      <button class="btn btn-sm btn-secondary" id="btn-dashboard">Dashboard</button>
-      <button class="btn btn-sm btn-secondary" id="btn-logout">Logout</button>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
   <!-- Tool grid -->
-  <div class="tool-grid" id="tool-grid">
+  <div id="tool-grid">
 
-    <div class="tool-card" data-tool="upload">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-      </svg>
-      <div class="name">File Upload</div>
-      <div class="desc">Upload images via API key</div>
+    <!-- Featured: Upload -->
+    <div class="tool-section">
+      <div class="tool-section-grid tool-section-grid--featured">
+        <div class="tool-card tool-card--featured" data-tool="upload">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <div class="tool-card--featured-text">
+            <div class="name">File Upload</div>
+            <div class="desc">Upload images via API key &middot; ShareX compatible</div>
+          </div>
+          <svg class="tool-card--featured-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
     </div>
 
-    <div class="tool-card" data-tool="timezone">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-      </svg>
-      <div class="name">Timezone</div>
-      <div class="desc">Convert between timezones</div>
+    <!-- Encode / Decode -->
+    <div class="tool-section">
+      <div class="tool-section-label">
+        <span class="tool-section-line"></span>
+        <span>Encode / Decode</span>
+        <span class="tool-section-line"></span>
+      </div>
+      <div class="tool-section-grid">
+        <div class="tool-card" data-tool="base64">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/>
+          </svg>
+          <div class="name">Base64</div>
+          <div class="desc">Encode &amp; decode strings</div>
+        </div>
+
+        <div class="tool-card" data-tool="url">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+          <div class="name">URL Encode</div>
+          <div class="desc">Encode &amp; decode URLs</div>
+        </div>
+
+        <div class="tool-card" data-tool="json">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h2"/><path d="M4 10h2"/><path d="M4 14h2"/><path d="M4 18h2"/><rect x="8" y="4" width="14" height="16" rx="2"/>
+          </svg>
+          <div class="name">JSON</div>
+          <div class="desc">Format &amp; validate JSON</div>
+        </div>
+      </div>
     </div>
 
-    <div class="tool-card" data-tool="base64">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/>
-      </svg>
-      <div class="name">Base64</div>
-      <div class="desc">Encode &amp; decode strings</div>
+    <!-- Generators -->
+    <div class="tool-section">
+      <div class="tool-section-label">
+        <span class="tool-section-line"></span>
+        <span>Generators</span>
+        <span class="tool-section-line"></span>
+      </div>
+      <div class="tool-section-grid">
+        <div class="tool-card" data-tool="password">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <div class="name">Password</div>
+          <div class="desc">Generate secure passwords</div>
+        </div>
+
+        <div class="tool-card" data-tool="uuid">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h6"/>
+          </svg>
+          <div class="name">UUID</div>
+          <div class="desc">Generate v4 UUIDs</div>
+        </div>
+
+        <div class="tool-card" data-tool="lorem">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 7h16"/><path d="M4 11h16"/><path d="M4 15h12"/><path d="M4 19h8"/>
+          </svg>
+          <div class="name">Lorem Ipsum</div>
+          <div class="desc">Generate placeholder text</div>
+        </div>
+
+        <div class="tool-card" data-tool="hash">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>
+          </svg>
+          <div class="name">Hash</div>
+          <div class="desc">SHA-1 / SHA-256 / SHA-512</div>
+        </div>
+      </div>
     </div>
 
-    <div class="tool-card" data-tool="json">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 6h2"/><path d="M4 10h2"/><path d="M4 14h2"/><path d="M4 18h2"/><rect x="8" y="4" width="14" height="16" rx="2"/>
-      </svg>
-      <div class="name">JSON</div>
-      <div class="desc">Format &amp; validate JSON</div>
+    <!-- Converters -->
+    <div class="tool-section">
+      <div class="tool-section-label">
+        <span class="tool-section-line"></span>
+        <span>Converters</span>
+        <span class="tool-section-line"></span>
+      </div>
+      <div class="tool-section-grid">
+        <div class="tool-card" data-tool="timezone">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <div class="name">Timezone</div>
+          <div class="desc">Convert between timezones</div>
+        </div>
+
+        <div class="tool-card" data-tool="timestamp">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 14l2 2-2 2"/>
+          </svg>
+          <div class="name">Timestamp</div>
+          <div class="desc">Unix epoch converter</div>
+        </div>
+
+        <div class="tool-card" data-tool="color">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="8" r="2"/><circle cx="8" cy="14" r="2"/><circle cx="16" cy="14" r="2"/>
+          </svg>
+          <div class="name">Color</div>
+          <div class="desc">HEX / RGB / HSL converter</div>
+        </div>
+
+        <div class="tool-card" data-tool="numbase">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M17 14v8"/><path d="M14 17h6"/>
+          </svg>
+          <div class="name">Num Base</div>
+          <div class="desc">BIN / OCT / DEC / HEX</div>
+        </div>
+      </div>
     </div>
 
-    <div class="tool-card" data-tool="url">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-      </svg>
-      <div class="name">URL Encode</div>
-      <div class="desc">Encode &amp; decode URLs</div>
-    </div>
+    <!-- Analysis -->
+    <div class="tool-section">
+      <div class="tool-section-label">
+        <span class="tool-section-line"></span>
+        <span>Analysis</span>
+        <span class="tool-section-line"></span>
+      </div>
+      <div class="tool-section-grid">
+        <div class="tool-card" data-tool="counter">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>
+          </svg>
+          <div class="name">Word Count</div>
+          <div class="desc">Characters, words &amp; lines</div>
+        </div>
 
-    <div class="tool-card" data-tool="password">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg>
-      <div class="name">Password</div>
-      <div class="desc">Generate secure passwords</div>
-    </div>
-
-    <div class="tool-card" data-tool="hash">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>
-      </svg>
-      <div class="name">Hash</div>
-      <div class="desc">SHA-1 / SHA-256 / SHA-512</div>
-    </div>
-
-    <div class="tool-card" data-tool="color">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/><circle cx="12" cy="8" r="2"/><circle cx="8" cy="14" r="2"/><circle cx="16" cy="14" r="2"/>
-      </svg>
-      <div class="name">Color</div>
-      <div class="desc">HEX / RGB / HSL converter</div>
-    </div>
-
-    <div class="tool-card" data-tool="counter">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>
-      </svg>
-      <div class="name">Word Count</div>
-      <div class="desc">Characters, words &amp; lines</div>
-    </div>
-
-    <div class="tool-card" data-tool="uuid">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h6"/>
-      </svg>
-      <div class="name">UUID</div>
-      <div class="desc">Generate v4 UUIDs</div>
-    </div>
-
-    <div class="tool-card" data-tool="timestamp">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 14l2 2-2 2"/>
-      </svg>
-      <div class="name">Timestamp</div>
-      <div class="desc">Unix epoch converter</div>
-    </div>
-
-    <div class="tool-card" data-tool="lorem">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 7h16"/><path d="M4 11h16"/><path d="M4 15h12"/><path d="M4 19h8"/>
-      </svg>
-      <div class="name">Lorem Ipsum</div>
-      <div class="desc">Generate placeholder text</div>
-    </div>
-
-    <div class="tool-card" data-tool="regex">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/>
-      </svg>
-      <div class="name">Regex</div>
-      <div class="desc">Test regular expressions</div>
-    </div>
-
-    <div class="tool-card" data-tool="numbase">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M17 14v8"/><path d="M14 17h6"/>
-      </svg>
-      <div class="name">Num Base</div>
-      <div class="desc">BIN / OCT / DEC / HEX</div>
+        <div class="tool-card" data-tool="regex">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/>
+          </svg>
+          <div class="name">Regex</div>
+          <div class="desc">Test regular expressions</div>
+        </div>
+      </div>
     </div>
 
   </div>
 
   <!-- ===== Panels ===== -->
-
-  <!-- Back button SVG reused via template -->
 
   <!-- File Upload -->
   <div class="tool-panel" id="panel-upload">
@@ -541,6 +589,16 @@
       </div>
     </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="footer" id="app-footer">
+    <div class="footer-line"></div>
+    <div class="footer-content">
+      <span class="footer-brand">SCORPIO</span>
+      <span class="footer-dot">&middot;</span>
+      <span class="footer-text">SYS.ONLINE</span>
+    </div>
+  </footer>
 
 </div>
 
