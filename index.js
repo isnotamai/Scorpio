@@ -493,7 +493,7 @@ app.get('/oembed/:filename', (req, res) => {
   res.json({
     version: '1.0',
     type: 'photo',
-    provider_name: `Scorpio \u2014 Uploaded by ${uploaderName}`,
+    provider_name: `\u2727 Scorpio \u2014 Uploaded by ${uploaderName}`,
     provider_url: BASE_URL,
   });
 });
@@ -542,7 +542,8 @@ app.get('/i/:filename', (req, res) => {
     // Get file metadata for description.
     const fileRow = db.getFileByFilename(filename);
     const fileSize = fileRow ? formatBytes(fileRow.size) : formatBytes(fs.statSync(filePath).size);
-    const description = [fileSize, ext.slice(1).toUpperCase(), 'scorpio.amai.lol'].filter(Boolean).join(' \u2022 ');
+    const dimStr = width && height ? `${width}\u00d7${height}` : '';
+    const description = [dimStr, fileSize, ext.slice(1).toUpperCase(), 'scorpio.amai.lol'].filter(Boolean).join(' \u2022 ');
 
     // GIFs: use video.other trick so Discord plays them inline at full size.
     const ogType = isGif ? 'video.other' : 'website';
@@ -553,14 +554,14 @@ app.get('/i/:filename', (req, res) => {
 <meta property="og:type" content="${ogType}">
 <meta property="og:site_name" content="Scorpio">
 <meta property="og:url" content="${BASE_URL}/i/${filename}">
-<meta property="og:title" content="${fileRow?.original_name || filename}">
+<meta property="og:title" content="\u2727 ${fileRow?.original_name || filename}">
 <meta property="og:description" content="${description}">
 <meta property="og:image" content="${imageUrl}">
 ${width ? `<meta property="og:image:width" content="${width}">` : ''}
 ${height ? `<meta property="og:image:height" content="${height}">` : ''}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="${imageUrl}">
-<meta name="theme-color" content="#d911f0">
+<meta name="theme-color" content="#00f0ff">
 <link type="application/json+oembed" href="${oEmbedUrl}">
 </head></html>`);
     return;
