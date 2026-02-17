@@ -560,7 +560,7 @@ ${width ? `<meta property="og:image:width" content="${width}">` : ''}
 ${height ? `<meta property="og:image:height" content="${height}">` : ''}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="${imageUrl}">
-<meta name="theme-color" content="#00f0ff">
+<meta name="theme-color" content="#d911f0">
 <link type="application/json+oembed" href="${oEmbedUrl}">
 </head></html>`);
     return;
