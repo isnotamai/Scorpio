@@ -542,8 +542,7 @@ app.get('/i/:filename', (req, res) => {
     // Get file metadata for description.
     const fileRow = db.getFileByFilename(filename);
     const fileSize = fileRow ? formatBytes(fileRow.size) : formatBytes(fs.statSync(filePath).size);
-    const dimStr = width && height ? `${width}x${height}` : '';
-    const description = [dimStr, fileSize, ext.slice(1).toUpperCase()].filter(Boolean).join(' \u2022 ');
+    const description = [fileSize, ext.slice(1).toUpperCase(), 'scorpio.amai.lol'].filter(Boolean).join(' \u2022 ');
 
     // GIFs: use video.other trick so Discord plays them inline at full size.
     const ogType = isGif ? 'video.other' : 'website';
