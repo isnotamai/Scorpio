@@ -9,6 +9,7 @@ const {nanoid} = require('nanoid');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
+const sizeOf = require('image-size');
 const db = require('./db');
 
 const app = express();
@@ -483,6 +484,32 @@ app.get('/raw/:filename', (req, res) => {
   res.sendFile(filePath);
 });
 
+// oEmbed endpoint for rich Discord embeds.
+app.get('/oembed/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const fileRow = db.getFileByFilename(filename);
+  const uploaderName = fileRow ? (db.getUserById(fileRow.user_id)?.username || 'Unknown') : 'Unknown';
+
+  res.json({
+    version: '1.0',
+    type: 'photo',
+    provider_name: `Scorpio \u2014 Uploaded by ${uploaderName}`,
+    provider_url: BASE_URL,
+  });
+});
+
+/**
+ * Format bytes into a human-readable string.
+ * @param {number} bytes
+ * @return {string}
+ */
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(i > 0 ? 2 : 0)} ${units[i]}`;
+}
+
 // Serve uploaded images with Discord embed support.
 app.get('/i/:filename', (req, res) => {
   const filePath = resolveUploadPath(req.params.filename);
@@ -497,17 +524,45 @@ app.get('/i/:filename', (req, res) => {
 
   const ua = req.headers['user-agent'] || '';
   if (/Discordbot/i.test(ua)) {
-    const imageUrl = `${BASE_URL}/raw/${req.params.filename}`;
+    const filename = req.params.filename;
+    const imageUrl = `${BASE_URL}/raw/${filename}`;
+    const oEmbedUrl = `${BASE_URL}/oembed/${filename}`;
+    const ext = path.extname(filename).toLowerCase();
+    const isGif = ext === '.gif';
+
+    // Get image dimensions for proper embed sizing.
+    let width = 0;
+    let height = 0;
+    try {
+      const dims = sizeOf(filePath);
+      width = dims.width || 0;
+      height = dims.height || 0;
+    } catch (_) { /* ignore */ }
+
+    // Get file metadata for description.
+    const fileRow = db.getFileByFilename(filename);
+    const fileSize = fileRow ? formatBytes(fileRow.size) : formatBytes(fs.statSync(filePath).size);
+    const dimStr = width && height ? `${width}x${height}` : '';
+    const description = [dimStr, fileSize, ext.slice(1).toUpperCase()].filter(Boolean).join(' \u2022 ');
+
+    // GIFs: use video.other trick so Discord plays them inline at full size.
+    const ogType = isGif ? 'video.other' : 'website';
+
     res.setHeader('Content-Type', 'text/html');
     res.send(`<!DOCTYPE html><html>
 <head>
-<meta property="og:type" content="website">
-<meta property="og:url" content="${BASE_URL}/i/${req.params.filename}">
+<meta property="og:type" content="${ogType}">
+<meta property="og:site_name" content="Scorpio">
+<meta property="og:url" content="${BASE_URL}/i/${filename}">
+<meta property="og:title" content="${fileRow?.original_name || filename}">
+<meta property="og:description" content="${description}">
 <meta property="og:image" content="${imageUrl}">
-<meta property="og:title" content="Scorpio">
+${width ? `<meta property="og:image:width" content="${width}">` : ''}
+${height ? `<meta property="og:image:height" content="${height}">` : ''}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="${imageUrl}">
-<meta name="theme-color" content="#0a0a0a">
+<meta name="theme-color" content="#00f0ff">
+<link type="application/json+oembed" href="${oEmbedUrl}">
 </head></html>`);
     return;
   }
