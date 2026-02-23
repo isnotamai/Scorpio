@@ -242,12 +242,23 @@
   });
 
   async function loadDashboard() {
+    // Pre-populate profile from cached user so it never shows "?" while loading
+    const cachedUser = getUser();
+    if (cachedUser) {
+      const un = cachedUser.username || '?';
+      document.getElementById('dash-avatar').textContent = un.charAt(0).toUpperCase();
+      document.getElementById('dash-profile-name').textContent = un;
+      const rb = document.getElementById('dash-role-badge');
+      rb.textContent = cachedUser.role || 'user';
+      rb.className = 'auth-role-badge role-' + (cachedUser.role || 'user');
+    }
+
     try {
       const res = await authFetch('/api/me');
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      // Profile card
+      // Profile card (update with fresh server data)
       const username = data.user.username || '?';
       document.getElementById('dash-avatar').textContent = username.charAt(0).toUpperCase();
       document.getElementById('dash-profile-name').textContent = username;
