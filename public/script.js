@@ -247,6 +247,14 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
+      // Profile card
+      const username = data.user.username || '?';
+      document.getElementById('dash-avatar').textContent = username.charAt(0).toUpperCase();
+      document.getElementById('dash-profile-name').textContent = username;
+      const roleBadge = document.getElementById('dash-role-badge');
+      roleBadge.textContent = data.user.role || 'user';
+      roleBadge.className = 'auth-role-badge role-' + (data.user.role || 'user');
+
       // Quota
       const isUnlimited = data.quota.max === -1;
       const pct = isUnlimited ? 0 : Math.round((data.quota.used / data.quota.max) * 100);
@@ -257,10 +265,15 @@
         ? data.quota.used + ' / \u221E (unlimited)'
         : data.quota.used + ' / ' + data.quota.max;
 
+      // Stats
+      document.getElementById('dash-stat-files').textContent = data.files.length;
+      document.getElementById('dash-stat-keys').textContent = data.api_keys.length;
+      document.getElementById('dash-stat-usage').textContent = isUnlimited ? '\u221E' : pct + '%';
+
       // API Keys
       const keysList = document.getElementById('dash-keys-list');
       if (data.api_keys.length === 0) {
-        keysList.innerHTML = '<div class="empty-state">No API keys</div>';
+        keysList.innerHTML = '<div class="empty-state">No API keys yet</div>';
       } else {
         keysList.innerHTML = data.api_keys.map(k => `
           <div class="key-item">
@@ -282,16 +295,34 @@
 
       // Files
       const filesList = document.getElementById('dash-files-list');
+      const fileCount = document.getElementById('dash-file-count');
+      fileCount.textContent = data.files.length;
       if (data.files.length === 0) {
-        filesList.innerHTML = '<div class="empty-state">No files uploaded</div>';
+        filesList.innerHTML = '<div class="empty-state">No files uploaded yet</div>';
       } else {
-        filesList.innerHTML = data.files.map(f => `
-          <div class="file-item">
-            <span class="file-name" title="${escapeHtml(f.original_name)}">${escapeHtml(f.original_name || f.filename)}</span>
-            <span class="file-size">${formatSize(f.size)}</span>
-            <a href="${escapeHtml(f.url)}" target="_blank" rel="noopener">View</a>
-          </div>
-        `).join('');
+        filesList.innerHTML = data.files.map(f => {
+          const name = f.original_name || f.filename;
+          const isImage = /\.(jpg|jpeg|png|gif|webp|bmp|svg|avif)$/i.test(name);
+          const thumbHtml = isImage
+            ? '<img class="file-thumb" src="' + escapeHtml(f.url) + '" alt="" loading="lazy">'
+            : '<div class="file-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>';
+          return `
+            <div class="file-item">
+              ${thumbHtml}
+              <div class="file-details">
+                <span class="file-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span>
+                <div class="file-meta">
+                  <span class="file-size">${formatSize(f.size)}</span>
+                </div>
+              </div>
+              <div class="file-actions">
+                <a href="${escapeHtml(f.url)}" target="_blank" rel="noopener" title="View">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+              </div>
+            </div>
+          `;
+        }).join('');
       }
 
       // Update quota in auth bar
