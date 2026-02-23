@@ -1442,6 +1442,7 @@ textarea {
 }
 
 .dash-body {
+  container-type: inline-size;
   padding: 0;
   overflow: hidden;
 }
@@ -1788,11 +1789,7 @@ textarea {
 }
 
 /* Responsive: collapse sidebar on small screens */
-@media (max-width: 680px) {
-  .app:has(#panel-dashboard.is-open) {
-    max-width: 800px;
-  }
-
+@container (max-width: 500px) {
   .dash-layout {
     grid-template-columns: 1fr;
   }
@@ -1818,6 +1815,12 @@ textarea {
 
   .dash-stat-card:last-child {
     border-right: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .app:has(#panel-dashboard.is-open) {
+    max-width: 800px;
   }
 }
 
