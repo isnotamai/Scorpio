@@ -129,6 +129,9 @@ const stmtDeleteFile = db.prepare(
 const stmtCountFilesByUser = db.prepare(
   'SELECT COUNT(*) AS count FROM files WHERE user_id = ?'
 );
+const stmtGetFileById = db.prepare(
+  'SELECT * FROM files WHERE id = ?'
+);
 
 // -- Sessions --
 
@@ -201,6 +204,9 @@ module.exports = {
   },
   getFileByFilename(filename) {
     return stmtGetFileByFilename.get(filename);
+  },
+  getFileById(id) {
+    return stmtGetFileById.get(id);
   },
   getFileByDeleteToken(token) {
     return stmtGetFileByDeleteToken.get(token);

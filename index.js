@@ -408,6 +408,25 @@ app.delete('/api/admin/users/:id', authenticateSession, requireAdmin, (req, res)
   res.json({success: true});
 });
 
+// -- Authenticated File Delete (from dashboard) --
+
+app.delete('/api/files/:id', authenticateSession, (req, res) => {
+  const fileId = parseInt(req.params.id, 10);
+  if (isNaN(fileId)) {
+    res.status(400).json({error: 'Invalid file ID'});
+    return;
+  }
+  const fileRow = db.getFileById(fileId);
+  if (!fileRow || fileRow.user_id !== req.user.id) {
+    res.status(404).json({error: 'File not found'});
+    return;
+  }
+  const filePath = resolveUploadPath(fileRow.filename);
+  if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  db.deleteFile(fileRow.id);
+  res.json({success: true});
+});
+
 // -- Upload --
 
 app.post('/upload', uploadLimiter, authenticate, (req, res, next) => {

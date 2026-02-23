@@ -278,7 +278,10 @@
         keysList.innerHTML = data.api_keys.map(k => `
           <div class="key-item">
             <span class="key-label">${escapeHtml(k.label)}</span>
-            <span class="key-preview">${escapeHtml(k.key_preview)}</span>
+            <div class="key-meta">
+              <span class="key-preview">${escapeHtml(k.key_preview)}</span>
+              ${k.created_at ? '<span class="key-date">' + formatDate(k.created_at) + '</span>' : ''}
+            </div>
             <button class="btn-danger" data-delete-key="${k.id}">Delete</button>
           </div>
         `).join('');
@@ -313,16 +316,37 @@
                 <span class="file-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span>
                 <div class="file-meta">
                   <span class="file-size">${formatSize(f.size)}</span>
+                  ${f.created_at ? '<span class="file-date">' + formatDate(f.created_at) + '</span>' : ''}
                 </div>
               </div>
               <div class="file-actions">
-                <a href="${escapeHtml(f.url)}" target="_blank" rel="noopener" title="View">
+                <a href="${escapeHtml(f.url)}" target="_blank" rel="noopener" class="icon-btn" title="View">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                 </a>
+                <button class="icon-btn" data-copy-url="${escapeHtml(f.url)}" title="Copy URL">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+                <button class="icon-btn icon-btn--danger" data-delete-file="${f.id}" title="Delete">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                </button>
               </div>
             </div>
           `;
         }).join('');
+
+        filesList.querySelectorAll('[data-copy-url]').forEach(btn => {
+          btn.addEventListener('click', () => copyText(btn.dataset.copyUrl));
+        });
+
+        filesList.querySelectorAll('[data-delete-file]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            if (!confirm('Delete this file? This cannot be undone.')) return;
+            const id = btn.dataset.deleteFile;
+            const r = await authFetch('/api/files/' + id, {method: 'DELETE'});
+            if (r.ok) { showToast('File deleted'); loadDashboard(); }
+            else { const d = await r.json(); showToast(d.error || 'Failed'); }
+          });
+        });
       }
 
       // Update quota in auth bar
@@ -445,6 +469,12 @@
     let i = 0;
     while (bytes >= 1024 && i < units.length - 1) { bytes /= 1024; i++; }
     return bytes.toFixed(i > 0 ? 1 : 0) + ' ' + units[i];
+  }
+
+  function formatDate(str) {
+    if (!str) return '';
+    const d = new Date(str.replace(' ', 'T') + 'Z');
+    return d.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'});
   }
 
   // Init auth UI
