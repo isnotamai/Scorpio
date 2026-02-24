@@ -47,7 +47,10 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 }
 
 /** @const {!RegExp} */
-const ALLOWED_TYPES = /jpeg|jpg|png|gif|webp|bmp|svg/;
+const ALLOWED_TYPES = /jpeg|jpg|png|gif|webp|bmp|svg|mp4|webm|mov|avi|mkv|quicktime|x-msvideo|x-matroska/;
+
+/** @const {!Set<string>} */
+const VIDEO_EXTS = new Set(['.mp4', '.webm', '.mov', '.avi', '.mkv']);
 
 /** @const {!RegExp} */
 const USERNAME_RE = /^[a-zA-Z0-9_-]{3,32}$/;
@@ -93,6 +96,42 @@ const keysLimiter = rateLimit({
  * Attaches req.user from DB.
  */
 function authenticate(req, res, next) {
+  const apiKey = req.headers['x-api-key'] || req.query.key;
+  if (!apiKey) {
+    res.status(401).json({error: 'Unauthorized'});
+    return;
+  }
+  const keyRow = db.getApiKeyByKey(apiKey);
+  if (!keyRow) {
+    res.status(401).json({error: 'Unauthorized'});
+    return;
+  }
+  const user = db.getUserById(keyRow.user_id);
+  if (!user) {
+    res.status(401).json({error: 'Unauthorized'});
+    return;
+  }
+  req.user = user;
+  next();
+}
+
+/**
+ * Authenticates for file upload: tries session Bearer token first, then API key.
+ * Attaches req.user from DB.
+ */
+function authenticateUploadRequest(req, res, next) {
+  const auth = req.headers['authorization'];
+  if (auth && auth.startsWith('Bearer ')) {
+    const token = auth.slice(7);
+    const session = db.getSession(token);
+    if (session) {
+      const user = db.getUserById(session.user_id);
+      if (user) {
+        req.user = user;
+        return next();
+      }
+    }
+  }
   const apiKey = req.headers['x-api-key'] || req.query.key;
   if (!apiKey) {
     res.status(401).json({error: 'Unauthorized'});
@@ -429,7 +468,7 @@ app.delete('/api/files/:id', authenticateSession, (req, res) => {
 
 // -- Upload --
 
-app.post('/upload', uploadLimiter, authenticate, (req, res, next) => {
+app.post('/upload', uploadLimiter, authenticateUploadRequest, (req, res, next) => {
   const userId = req.user.id;
   const quota = getQuota(req.user.role);
 
@@ -445,7 +484,7 @@ app.post('/upload', uploadLimiter, authenticate, (req, res, next) => {
   const form = formidable({
     uploadDir: UPLOADS_DIR,
     keepExtensions: true,
-    maxFileSize: 50 * 1024 * 1024, // 50 MB
+    maxFileSize: 500 * 1024 * 1024, // 500 MB
     maxFiles: 1,
     filename(name, ext) {
       return `${nanoid(10)}${ext}`;
@@ -529,7 +568,7 @@ function formatBytes(bytes) {
   return `${(bytes / Math.pow(1024, i)).toFixed(i > 0 ? 2 : 0)} ${units[i]}`;
 }
 
-// Serve uploaded images with Discord embed support.
+// Serve uploaded files with Discord embed support.
 app.get('/i/:filename', (req, res) => {
   const filePath = resolveUploadPath(req.params.filename);
   if (!filePath) {
@@ -541,15 +580,43 @@ app.get('/i/:filename', (req, res) => {
     return;
   }
 
+  const filename = req.params.filename;
+  const rawUrl = `${BASE_URL}/raw/${filename}`;
+  const ext = path.extname(filename).toLowerCase();
+  const isVideoFile = VIDEO_EXTS.has(ext);
+
+  const fileRow = db.getFileByFilename(filename);
+  const fileSize = fileRow ? formatBytes(fileRow.size) : formatBytes(fs.statSync(filePath).size);
+  const originalName = fileRow?.original_name || filename;
+  const uploaderName = fileRow ? (db.getUserById(fileRow.user_id)?.username || 'Unknown') : 'Unknown';
+  const uploadDate = fileRow?.created_at || '';
+
   const ua = req.headers['user-agent'] || '';
   if (/Discordbot/i.test(ua)) {
-    const filename = req.params.filename;
-    const imageUrl = `${BASE_URL}/raw/${filename}`;
     const oEmbedUrl = `${BASE_URL}/oembed/${filename}`;
-    const ext = path.extname(filename).toLowerCase();
-    const isGif = ext === '.gif';
+    const description = [fileSize, ext.slice(1).toUpperCase(), 'scorpio.amai.lol'].filter(Boolean).join(' \u2022 ');
 
-    // Get image dimensions for proper embed sizing.
+    if (isVideoFile) {
+      const videoMimeMap = {'.mp4': 'video/mp4', '.webm': 'video/webm', '.mov': 'video/quicktime', '.avi': 'video/x-msvideo', '.mkv': 'video/x-matroska'};
+      const videoMime = videoMimeMap[ext] || 'video/mp4';
+      res.setHeader('Content-Type', 'text/html');
+      res.send(`<!DOCTYPE html><html lang="en"><head>
+<meta property="og:type" content="video.other">
+<meta property="og:site_name" content="Scorpio">
+<meta property="og:url" content="${BASE_URL}/i/${filename}">
+<meta property="og:title" content="\u2727 ${originalName}">
+<meta property="og:description" content="${description}">
+<meta property="og:video" content="${rawUrl}">
+<meta property="og:video:secure_url" content="${rawUrl}">
+<meta property="og:video:type" content="${videoMime}">
+<meta name="theme-color" content="#00f0ff">
+<link type="application/json+oembed" href="${oEmbedUrl}">
+</head></html>`);
+      return;
+    }
+
+    // Image embed
+    const isGif = ext === '.gif';
     let width = 0;
     let height = 0;
     try {
@@ -557,54 +624,43 @@ app.get('/i/:filename', (req, res) => {
       width = dims.width || 0;
       height = dims.height || 0;
     } catch (_) { /* ignore */ }
-
-    // Get file metadata for description.
-    const fileRow = db.getFileByFilename(filename);
-    const fileSize = fileRow ? formatBytes(fileRow.size) : formatBytes(fs.statSync(filePath).size);
     const dimStr = width && height ? `${width}\u00d7${height}` : '';
-    const description = [dimStr, fileSize, ext.slice(1).toUpperCase(), 'scorpio.amai.lol'].filter(Boolean).join(' \u2022 ');
-
-    // GIFs: use video.other trick so Discord plays them inline at full size.
+    const descriptionImg = [dimStr, fileSize, ext.slice(1).toUpperCase(), 'scorpio.amai.lol'].filter(Boolean).join(' \u2022 ');
     const ogType = isGif ? 'video.other' : 'website';
 
     res.setHeader('Content-Type', 'text/html');
-    res.send(`<!DOCTYPE html><html>
-<head>
+    res.send(`<!DOCTYPE html><html lang="en"><head>
 <meta property="og:type" content="${ogType}">
 <meta property="og:site_name" content="Scorpio">
 <meta property="og:url" content="${BASE_URL}/i/${filename}">
-<meta property="og:title" content="\u2727 ${fileRow?.original_name || filename}">
-<meta property="og:description" content="${description}">
-<meta property="og:image" content="${imageUrl}">
+<meta property="og:title" content="\u2727 ${originalName}">
+<meta property="og:description" content="${descriptionImg}">
+<meta property="og:image" content="${rawUrl}">
 ${width ? `<meta property="og:image:width" content="${width}">` : ''}
 ${height ? `<meta property="og:image:height" content="${height}">` : ''}
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="${imageUrl}">
+<meta name="twitter:image" content="${rawUrl}">
 <meta name="theme-color" content="#00f0ff">
 <link type="application/json+oembed" href="${oEmbedUrl}">
 </head></html>`);
     return;
   }
 
-  // Styled image viewer for browsers
-  const filename = req.params.filename;
-  const rawUrl = `${BASE_URL}/raw/${filename}`;
-  const ext = path.extname(filename).toLowerCase();
-
+  // Browser viewer
   let width = 0;
   let height = 0;
-  try {
-    const dims = sizeOf(filePath);
-    width = dims.width || 0;
-    height = dims.height || 0;
-  } catch (_) { /* ignore */ }
-
-  const fileRow = db.getFileByFilename(filename);
-  const fileSize = fileRow ? formatBytes(fileRow.size) : formatBytes(fs.statSync(filePath).size);
-  const originalName = fileRow?.original_name || filename;
-  const uploaderName = fileRow ? (db.getUserById(fileRow.user_id)?.username || 'Unknown') : 'Unknown';
-  const uploadDate = fileRow?.created_at || '';
+  if (!isVideoFile) {
+    try {
+      const dims = sizeOf(filePath);
+      width = dims.width || 0;
+      height = dims.height || 0;
+    } catch (_) { /* ignore */ }
+  }
   const dimStr = width && height ? `${width} \u00d7 ${height}` : '';
+
+  const mediaHtml = isVideoFile
+    ? `<div class="media-wrap"><video controls preload="metadata" src="${rawUrl}"></video></div>`
+    : `<a href="${rawUrl}" class="media-wrap"><img src="${rawUrl}" alt="${originalName}"></a>`;
 
   res.setHeader('Content-Type', 'text/html');
   res.send(`<!DOCTYPE html><html lang="en">
@@ -612,7 +668,7 @@ ${height ? `<meta property="og:image:height" content="${height}">` : ''}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${originalName} \u2014 Scorpio</title>
-<meta property="og:image" content="${rawUrl}">
+${!isVideoFile ? `<meta property="og:image" content="${rawUrl}">` : ''}
 <meta name="theme-color" content="#00f0ff">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -621,18 +677,15 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',-apple-system
 body::before{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,240,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;animation:grid-drift 20s linear infinite}
 @keyframes grid-drift{0%{transform:translate(0,0)}100%{transform:translate(60px,60px)}}
 @keyframes fade-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-
 .topbar{position:sticky;top:0;z-index:100;width:100%;background:rgba(5,10,14,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
 .topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.3}
 .topbar-inner{max-width:900px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:10px}
 .topbar-brand{color:var(--accent);font-size:1rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;text-shadow:0 0 10px var(--accent-glow);text-decoration:none}
-
 .viewer{position:relative;z-index:1;width:100%;max-width:900px;padding:24px;flex:1;display:flex;flex-direction:column;align-items:center;animation:fade-in .5s ease-out}
-
-.image-wrap{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--border);transition:border-color .3s,box-shadow .3s;line-height:0;max-width:100%}
-.image-wrap:hover{border-color:var(--border-hover);box-shadow:0 0 30px rgba(0,240,255,.08),0 8px 32px rgba(0,0,0,.5)}
-.image-wrap img{max-width:100%;max-height:80vh;display:block;object-fit:contain}
-
+.media-wrap{border-radius:10px;overflow:hidden;border:1px solid var(--border);transition:border-color .3s,box-shadow .3s;max-width:100%;line-height:0}
+.media-wrap:hover{border-color:var(--border-hover);box-shadow:0 0 30px rgba(0,240,255,.08),0 8px 32px rgba(0,0,0,.5)}
+.media-wrap img{max-width:100%;max-height:80vh;display:block;object-fit:contain}
+.media-wrap video{max-width:100%;max-height:80vh;display:block;background:#000;outline:none}
 .info{width:100%;margin-top:16px;background:rgba(8,18,27,.85);border:1px solid var(--border);border-radius:10px;padding:16px 20px;backdrop-filter:blur(10px);position:relative;animation:fade-in .5s ease-out .15s both}
 .info::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.3}
 .info-row{display:flex;flex-wrap:wrap;align-items:center;gap:16px;justify-content:space-between}
@@ -640,7 +693,6 @@ body::before{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0
 .info-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);font-weight:500}
 .info-value{font-size:13px;color:var(--text-bright);font-family:'Cascadia Code','Fira Code',Consolas,monospace}
 .info-name{font-size:14px;color:var(--text-bright);word-break:break-all;font-weight:500}
-
 .actions{display:flex;gap:8px;margin-top:16px;animation:fade-in .5s ease-out .25s both}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;letter-spacing:.5px;text-decoration:none;transition:all .3s;cursor:pointer;border:none;font-family:inherit}
 .btn-primary{background:linear-gradient(135deg,var(--accent),#00b8d4);color:#050a0e;font-weight:600;text-transform:uppercase}
@@ -648,14 +700,13 @@ body::before{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0
 .btn-secondary{background:rgba(0,240,255,.06);border:1px solid var(--border);color:var(--accent)}
 .btn-secondary:hover{background:rgba(0,240,255,.12);border-color:var(--border-hover);box-shadow:0 0 12px rgba(0,240,255,.08)}
 .btn svg{width:14px;height:14px}
-
 @media(max-width:540px){.viewer{padding:12px}.info-row{gap:10px}.info-item{min-width:45%}}
 </style>
 </head>
 <body>
 <div class="topbar"><div class="topbar-inner"><a class="topbar-brand" href="${BASE_URL}">\u2727 Scorpio</a></div></div>
 <div class="viewer">
-  <a href="${rawUrl}" class="image-wrap"><img src="${rawUrl}" alt="${originalName}"></a>
+  ${mediaHtml}
   <div class="info"><div class="info-row">
     <div class="info-item"><span class="info-label">File</span><span class="info-name">${originalName}</span></div>
     ${dimStr ? `<div class="info-item"><span class="info-label">Dimensions</span><span class="info-value">${dimStr}</span></div>` : ''}
@@ -665,7 +716,7 @@ body::before{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0
     ${uploadDate ? `<div class="info-item"><span class="info-label">Date</span><span class="info-value">${uploadDate}</span></div>` : ''}
   </div></div>
   <div class="actions">
-    <a href="${rawUrl}" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Open Raw</a>
+    <a href="${rawUrl}" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>${isVideoFile ? 'Open' : 'Open Raw'}</a>
     <a href="${rawUrl}" download="${originalName}" class="btn btn-secondary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download</a>
   </div>
 </div>
@@ -715,6 +766,11 @@ app.get('/delete/:filename', (req, res) => {
   }
 
   res.status(401).json({error: 'Delete token or API key required'});
+});
+
+// Serve dashboard page.
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
 // Serve static assets (logo, favicon, etc.) from public/.

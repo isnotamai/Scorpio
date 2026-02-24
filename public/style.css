@@ -1436,8 +1436,9 @@ textarea {
 
 /* ===== Dashboard ===== */
 
-/* Expand container width when dashboard is open */
-.app:has(#panel-dashboard.is-open) {
+/* Expand container width when dashboard is open or on the dashboard page */
+.app:has(#panel-dashboard.is-open),
+.app--wide {
   max-width: 1000px;
 }
 
@@ -1819,7 +1820,8 @@ textarea {
 }
 
 @media (max-width: 560px) {
-  .app:has(#panel-dashboard.is-open) {
+  .app:has(#panel-dashboard.is-open),
+  .app--wide {
     max-width: 800px;
   }
 }
