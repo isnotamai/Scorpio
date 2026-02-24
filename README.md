@@ -1,43 +1,44 @@
 # Scorpio
 
-A self-hosted file upload server with a built-in developer toolbox. Designed for personal use with ShareX integration, multi-user support, and a sleek cyberpunk-themed web interface.
+A self-hosted file upload server with ShareX integration, multi-user auth, and a built-in developer toolbox.
 
 ## Features
 
-### File Upload
-- ShareX compatible `POST /upload` endpoint
-- API key authentication (`X-API-Key` header)
-- Supports JPEG, PNG, GIF, WebP, BMP, SVG, AVIF
-- 50 MB file size limit
-- nanoid-based unique filenames
-- Per-file delete tokens (no API key leakage in delete URLs)
-- Discord embed support with rich metadata and oEmbed
+**File Hosting**
+- ShareX-compatible upload endpoint (`POST /upload`)
+- Images: JPEG, PNG, GIF, WebP, BMP, SVG
+- Videos: MP4, WebM, MOV, AVI, MKV — up to 500 MB
+- Unique nanoid filenames, per-file delete tokens
+- Rich Discord embeds via Open Graph + oEmbed
+- Browser viewer with file metadata
 
-### Multi-User System
-- Registration & login with bcrypt password hashing
-- Session-based auth (64-char hex tokens, 7-day expiry)
-- Role-based quotas:
-  - **admin** — unlimited uploads
-  - **pro** — 50 uploads
-  - **user** — 10 uploads
-- Admin dashboard for user and role management
-- Per-user API key management (create / delete)
-- Rate limiting on auth and upload endpoints
+**Auth & Users**
+- Registration and login with bcrypt password hashing
+- Session tokens (64-char hex, 7-day expiry)
+- API key auth for ShareX (`X-API-Key` header)
+- Up to 5 API keys per user
 
-### Dashboard
-- User profile card with avatar, role badge, and stats
-- Real-time quota bar with usage percentage
-- API key management with create / delete
-- Uploaded file browser with image thumbnails
-- Admin panel: view all users, change roles, delete users
+**Role System**
 
-### Web Toolbox
+| Role | Upload Quota |
+|------|-------------|
+| `admin` | Unlimited |
+| `pro` | 50 files |
+| `user` | 10 files |
+
+**Dashboard**
+- Upload quota bar and stats
+- API key management (create / delete)
+- File browser with image thumbnails and copy/delete actions
+- Admin panel: view all users, change roles, delete accounts
+
+**Web Toolbox**
 
 | Category | Tools |
-|---|---|
-| Upload | File Upload (drag & drop, ShareX compatible) |
+|----------|-------|
+| Upload | Drag-and-drop file upload, ShareX compatible |
 | Encode / Decode | Base64, URL Encode, JSON Formatter |
-| Generators | Password, UUID, Lorem Ipsum |
+| Generators | Password, UUID v4, Lorem Ipsum |
 | Converters | Timezone, Unix Timestamp, Color (HEX/RGB/HSL), Number Base |
 | Analysis | Hash (SHA-1/256/512), Word Count, Regex Tester |
 
@@ -48,14 +49,26 @@ npm install
 npm start
 ```
 
-The server starts on port `3000` by default. The default admin account `amai` is seeded on first run.
+Create a `.env` file before starting:
 
-### Environment Variables
+```env
+PORT=3000
+BASE_URL=https://your-domain.com
+```
 
-| Variable | Default | Description |
-|---|---|---|
-| `PORT` | `3000` | Server port |
-| `BASE_URL` | `http://localhost:PORT` | Public base URL for generated links |
+The default admin account (`amai`) is seeded automatically on first run.
+
+## ShareX Configuration
+
+```
+Request Method:  POST
+Request URL:     https://your-domain.com/upload
+Headers:         X-API-Key: <your-key>
+Body:            MultipartFormData
+File Form Name:  file
+URL:             {json:url}
+Deletion URL:    {json:delete_url}
+```
 
 ## API Reference
 
@@ -63,67 +76,97 @@ The server starts on port `3000` by default. The default admin account `amai` is
 
 ```
 POST /upload
-Header: X-API-Key: <your-key>
-Body: multipart/form-data (field: file)
+X-API-Key: <key>          — ShareX / API clients
+Authorization: Bearer <token>  — Web UI
+Content-Type: multipart/form-data
+
+Body field: file
 ```
 
+**Response**
 ```json
 {
   "success": true,
-  "url": "https://example.com/i/abc123.png",
-  "delete_url": "https://example.com/delete/abc123.png?token=...",
-  "filename": "abc123.png"
+  "url": "https://example.com/i/aBcDeFgHiJ.png",
+  "delete_url": "https://example.com/delete/aBcDeFgHiJ.png?token=...",
+  "filename": "aBcDeFgHiJ.png"
 }
 ```
 
 ### Auth
 
 | Method | Endpoint | Body | Auth |
-|---|---|---|---|
-| POST | `/api/register` | `{ username, password }` | — |
-| POST | `/api/login` | `{ username, password }` | — |
-| POST | `/api/logout` | — | Bearer token |
-| GET | `/api/me` | — | Bearer token |
+|--------|----------|------|------|
+| `POST` | `/api/register` | `{ username, password }` | — |
+| `POST` | `/api/login` | `{ username, password }` | — |
+| `POST` | `/api/logout` | — | Bearer |
+| `GET` | `/api/me` | — | Bearer |
 
 ### API Keys
 
 | Method | Endpoint | Body | Auth |
-|---|---|---|---|
-| POST | `/api/keys` | `{ label }` | Bearer token |
-| DELETE | `/api/keys/:id` | — | Bearer token |
+|--------|----------|------|------|
+| `POST` | `/api/keys` | `{ label }` | Bearer |
+| `DELETE` | `/api/keys/:id` | — | Bearer |
+
+### Files
+
+| Method | Endpoint | Auth |
+|--------|----------|------|
+| `GET` | `/i/:filename` | — |
+| `GET` | `/raw/:filename` | — |
+| `GET` | `/delete/:filename?token=...` | Delete token |
+| `DELETE` | `/api/files/:id` | Bearer |
 
 ### Admin
 
 | Method | Endpoint | Body | Auth |
-|---|---|---|---|
-| GET | `/api/admin/users` | — | Admin only |
-| PUT | `/api/admin/users/:id/role` | `{ role }` | Admin only |
-| DELETE | `/api/admin/users/:id` | — | Admin only |
+|--------|----------|------|------|
+| `GET` | `/api/admin/users` | — | Admin |
+| `PUT` | `/api/admin/users/:id/role` | `{ role }` | Admin |
+| `DELETE` | `/api/admin/users/:id` | — | Admin |
 
-### Images
+## Rate Limits
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/i/:filename` | View uploaded image |
-| GET | `/delete/:filename?token=...` | Delete image by token |
+| Endpoint | Limit |
+|----------|-------|
+| Register | 3 / hour |
+| Login | 10 / 15 min |
+| Upload | 10 / min |
+| Key creation | 10 / hour |
 
-## ShareX Configuration
+## Project Structure
 
-Import `sharex-config.sxcu` or configure manually:
-
-- **Request Method:** POST
-- **Request URL:** `https://your-domain/upload`
-- **Headers:** `X-API-Key: <your-key>`
-- **Body:** MultipartFormData
-- **File Form Name:** `file`
-- **URL:** `{json:url}`
-- **Deletion URL:** `{json:delete_url}`
+```
+scorpio/
+├── index.js                  # Entry point
+├── db.js                     # SQLite schema + prepared statements
+├── src/
+│   ├── config.js             # Constants and env vars
+│   ├── utils.js              # Token generation, session creation
+│   ├── middleware/
+│   │   └── auth.js           # Auth middleware (API key, Bearer, admin)
+│   └── routes/
+│       ├── auth.js           # /api/register, /api/login, /api/logout
+│       ├── user.js           # /api/me, /api/keys
+│       ├── admin.js          # /api/admin/users
+│       └── files.js          # /upload, /i/:file, /raw, /delete
+├── public/
+│   ├── index.html            # Toolbox
+│   ├── dashboard.html        # User dashboard
+│   ├── script.js             # Toolbox logic
+│   ├── dashboard.js          # Dashboard logic
+│   └── style.css             # Shared design system
+├── uploads/                  # Stored files (git-ignored)
+└── data/                     # SQLite database (git-ignored)
+```
 
 ## Tech Stack
 
 - **Runtime:** Node.js
-- **Framework:** [Express](https://expressjs.com/)
-- **Database:** [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) (SQLite)
+- **Framework:** Express
+- **Database:** SQLite via [better-sqlite3](https://github.com/WiseLibs/better-sqlite3)
 - **File Parsing:** [formidable](https://github.com/node-formidable/formidable)
+- **Auth:** bcryptjs, crypto (built-in)
 - **IDs:** [nanoid](https://github.com/ai/nanoid)
-- **Auth:** [bcryptjs](https://github.com/dcodeIO/bcrypt.js)
+- **Rate Limiting:** express-rate-limit

@@ -1,20 +1,22 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scorpio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-<!-- Top navigation bar -->
 <nav class="topbar">
   <div class="topbar-inner">
     <div class="topbar-brand">
       <img class="logo" src="/logo.png" alt="Scorpio">
       <h1>Scorpio</h1>
-      <span class="topbar-tag">TOOLBOX</span>
+      <span class="topbar-tag">Toolbox</span>
     </div>
     <div class="topbar-auth" id="auth-bar">
       <div class="auth-logged-out" id="auth-logged-out">
@@ -34,7 +36,6 @@
 
 <div class="app">
 
-  <!-- Tool grid -->
   <div id="tool-grid">
 
     <!-- Featured: Upload -->
@@ -46,7 +47,7 @@
           </svg>
           <div class="tool-card--featured-text">
             <div class="name">File Upload</div>
-            <div class="desc">Upload images &amp; videos &middot; Web or API key</div>
+            <div class="desc">Upload images &amp; videos &middot; ShareX compatible &middot; Max 500 MB</div>
           </div>
           <svg class="tool-card--featured-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
@@ -211,10 +212,10 @@
     <div class="tool-body">
       <div id="api-key-field" class="field">
         <label for="api-key">API Key</label>
-        <input type="password" id="api-key" placeholder="Enter API key">
+        <input type="password" id="api-key" placeholder="Enter your API key">
       </div>
-      <div id="upload-user-info" class="field" style="display:none">
-        <div id="upload-username-display" style="color:var(--accent);font-size:13px;font-weight:500"></div>
+      <div id="upload-user-info" style="display:none;margin-bottom:12px">
+        <div id="upload-username-display" style="font-size:.8rem;color:var(--accent);font-weight:500"></div>
       </div>
       <div class="drop-zone" id="drop-zone">
         <p>Drop file here or click to select</p>
@@ -244,7 +245,9 @@
         <div><label for="tz-from">From</label><select id="tz-from"></select></div>
         <div><label for="tz-to">To</label><select id="tz-to"></select></div>
       </div>
-      <button class="btn btn-primary" id="tz-convert">Convert</button>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="tz-convert">Convert</button>
+      </div>
       <div class="tz-result" id="tz-result">
         <div id="tz-output"></div>
         <div class="sub" id="tz-sub"></div>
@@ -267,11 +270,13 @@
         <button class="btn btn-primary" id="b64-encode">Encode</button>
         <button class="btn btn-secondary" id="b64-decode">Decode</button>
       </div>
-      <div class="field" style="margin-top: 16px">
+      <div class="field">
         <label for="b64-output">Output</label>
         <textarea class="mono-output" id="b64-output" readonly></textarea>
       </div>
-      <button class="btn btn-secondary" id="b64-copy">Copy Output</button>
+      <div class="btn-group">
+        <button class="btn btn-secondary" id="b64-copy">Copy Output</button>
+      </div>
       <div class="status" id="b64-status"></div>
     </div>
   </div>
@@ -285,16 +290,16 @@
     <div class="tool-body">
       <div class="field">
         <label for="json-input">Input</label>
-        <textarea id="json-input" placeholder='Paste JSON here...'></textarea>
+        <textarea id="json-input" placeholder="Paste JSON here..."></textarea>
       </div>
       <div class="btn-group">
         <button class="btn btn-primary" id="json-format">Format</button>
         <button class="btn btn-secondary" id="json-minify">Minify</button>
         <button class="btn btn-secondary" id="json-copy">Copy</button>
       </div>
-      <div class="field" style="margin-top: 16px">
+      <div class="field">
         <label for="json-output">Output</label>
-        <textarea class="mono-output" id="json-output" readonly style="min-height: 160px"></textarea>
+        <textarea class="mono-output" id="json-output" readonly style="min-height:160px"></textarea>
       </div>
       <div class="status" id="json-status"></div>
     </div>
@@ -316,7 +321,7 @@
         <button class="btn btn-secondary" id="url-decode">Decode</button>
         <button class="btn btn-secondary" id="url-copy">Copy</button>
       </div>
-      <div class="field" style="margin-top: 16px">
+      <div class="field">
         <label for="url-output">Output</label>
         <textarea class="mono-output" id="url-output" readonly></textarea>
       </div>
@@ -337,9 +342,9 @@
         <input type="number" id="pw-length" value="20" min="4" max="128">
       </div>
       <div class="checkbox-row">
-        <label><input type="checkbox" id="pw-upper" checked> A-Z</label>
-        <label><input type="checkbox" id="pw-lower" checked> a-z</label>
-        <label><input type="checkbox" id="pw-digits" checked> 0-9</label>
+        <label><input type="checkbox" id="pw-upper" checked> A–Z</label>
+        <label><input type="checkbox" id="pw-lower" checked> a–z</label>
+        <label><input type="checkbox" id="pw-digits" checked> 0–9</label>
         <label><input type="checkbox" id="pw-symbols" checked> !@#$</label>
       </div>
       <div class="btn-group">
@@ -360,8 +365,10 @@
         <label for="hash-input">Input</label>
         <textarea id="hash-input" placeholder="Enter text to hash"></textarea>
       </div>
-      <button class="btn btn-primary" id="hash-generate">Generate Hashes</button>
-      <div class="hash-output" id="hash-output" style="display: none"></div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="hash-generate">Generate Hashes</button>
+      </div>
+      <div class="hash-output" id="hash-output"></div>
     </div>
   </div>
 
@@ -372,7 +379,7 @@
       <div class="tool-panel-title">Color Converter</div>
     </div>
     <div class="tool-body">
-      <div class="color-preview" id="color-preview" style="background: #6366f1"></div>
+      <div class="color-preview" id="color-preview" style="background:#6366f1"></div>
       <div class="field">
         <label for="color-hex">HEX</label>
         <input type="text" id="color-hex" value="#6366f1" placeholder="#000000">
@@ -387,7 +394,9 @@
         <div><label for="color-s">S</label><input type="number" id="color-s" value="84" min="0" max="100"></div>
         <div><label for="color-l">L</label><input type="number" id="color-l" value="67" min="0" max="100"></div>
       </div>
-      <button class="btn btn-secondary" id="color-copy">Copy HEX</button>
+      <div class="btn-group">
+        <button class="btn btn-secondary" id="color-copy">Copy HEX</button>
+      </div>
     </div>
   </div>
 
@@ -400,7 +409,7 @@
     <div class="tool-body">
       <div class="field">
         <label for="wc-input">Text</label>
-        <textarea id="wc-input" placeholder="Start typing or paste text..." style="min-height: 140px"></textarea>
+        <textarea id="wc-input" placeholder="Start typing or paste text..." style="min-height:140px"></textarea>
       </div>
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-value" id="wc-chars">0</div><div class="stat-label">Characters</div></div>
@@ -430,7 +439,7 @@
         <button class="btn btn-primary" id="uuid-generate">Generate</button>
         <button class="btn btn-secondary" id="uuid-copy">Copy</button>
       </div>
-      <div class="field" style="margin-top: 16px">
+      <div class="field">
         <label for="uuid-output">Output</label>
         <textarea class="mono-output" id="uuid-output" readonly></textarea>
       </div>
@@ -446,7 +455,7 @@
     <div class="tool-body">
       <div class="field">
         <label>Current Time</label>
-        <div class="password-display" id="ts-live" style="font-size: 14px; letter-spacing: 0">—</div>
+        <div class="password-display" id="ts-live" style="font-size:.82rem;letter-spacing:.02em;font-weight:400">—</div>
       </div>
       <div class="field">
         <label for="ts-input">Timestamp (seconds)</label>
@@ -461,18 +470,16 @@
         <div class="result-value"><div class="result-label">Local</div><span id="ts-local"></span></div>
         <div class="result-value"><div class="result-label">ISO 8601</div><span id="ts-iso"></span></div>
       </div>
-      <div style="margin-top: 20px">
-        <div class="field">
-          <label for="ts-date-input">Date &amp; Time</label>
-          <input type="datetime-local" id="ts-date-input">
-        </div>
-        <div class="btn-group">
-          <button class="btn btn-primary" id="ts-to-unix">To Timestamp</button>
-          <button class="btn btn-secondary" id="ts-copy-unix">Copy</button>
-        </div>
-        <div class="result" id="ts-unix-result">
-          <div class="result-value"><div class="result-label">Unix Timestamp</div><span id="ts-unix-out"></span></div>
-        </div>
+      <div class="field" style="margin-top:20px">
+        <label for="ts-date-input">Date &amp; Time</label>
+        <input type="datetime-local" id="ts-date-input">
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="ts-to-unix">To Timestamp</button>
+        <button class="btn btn-secondary" id="ts-copy-unix">Copy</button>
+      </div>
+      <div class="result" id="ts-unix-result">
+        <div class="result-value"><div class="result-label">Unix</div><span id="ts-unix-out"></span></div>
       </div>
       <div class="status" id="ts-status"></div>
     </div>
@@ -503,9 +510,9 @@
         <button class="btn btn-primary" id="lorem-generate">Generate</button>
         <button class="btn btn-secondary" id="lorem-copy">Copy</button>
       </div>
-      <div class="field" style="margin-top: 16px">
+      <div class="field">
         <label for="lorem-output">Output</label>
-        <textarea class="mono-output" id="lorem-output" readonly style="min-height: 160px; font-family: inherit"></textarea>
+        <textarea class="mono-output" id="lorem-output" readonly style="min-height:160px;font-family:inherit"></textarea>
       </div>
     </div>
   </div>
@@ -531,7 +538,9 @@
       </div>
       <div class="field">
         <label>Matches</label>
-        <div class="hash-output" id="regex-output" style="display: block; min-height: 48px">No matches</div>
+        <div class="hash-output" id="regex-output" style="display:block;min-height:48px">
+          <span style="color:var(--text-dim);font-size:.78rem">Enter a pattern to see matches</span>
+        </div>
       </div>
       <div class="status" id="regex-status"></div>
     </div>
@@ -564,7 +573,6 @@
     </div>
   </div>
 
-  <!-- Footer -->
   <footer class="footer" id="app-footer">
     <div class="footer-line"></div>
     <div class="footer-content">
@@ -589,7 +597,9 @@
       <label for="auth-password-input">Password</label>
       <input type="password" id="auth-password-input" placeholder="Enter password" autocomplete="current-password">
     </div>
-    <button class="btn btn-primary" id="auth-submit" style="width:100%">Login</button>
+    <div class="btn-group" style="margin-top:4px">
+      <button class="btn btn-primary" id="auth-submit" style="width:100%">Login</button>
+    </div>
     <div class="status" id="auth-status"></div>
     <div class="modal-toggle">
       <span id="modal-toggle-text">Don't have an account?</span>
