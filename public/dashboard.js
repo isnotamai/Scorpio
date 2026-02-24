@@ -49,7 +49,7 @@
     toast.classList.remove('is-visible');
     void toast.offsetWidth;
     toast.classList.add('is-visible');
-    setTimeout(() => toast.classList.remove('is-visible'), 1500);
+    setTimeout(() => toast.classList.remove('is-visible'), 2000);
   }
 
   function copyText(text) {
@@ -79,6 +79,11 @@
     return d.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'});
   }
 
+  function showStatus(el, msg, isOk) {
+    el.textContent = msg;
+    el.className = 'status is-visible' + (isOk ? ' is-ok' : '');
+  }
+
   // -- Topbar --
 
   const cachedUser = getUser();
@@ -95,7 +100,179 @@
     window.location.href = '/';
   });
 
-  // -- Dashboard --
+  // ============================================================
+  // ShareX Config Generator
+  // ============================================================
+
+  /**
+   * Builds a ShareX .sxcu config object.
+   * @param {string} apiKey
+   * @param {string} label
+   * @return {!Object}
+   */
+  function buildSxcu(apiKey, label) {
+    const base = window.location.origin;
+    return {
+      Version: '15.0.0',
+      Name: 'Scorpio' + (label ? ' \u2014 ' + label : ''),
+      DestinationType: 'ImageUploader, FileUploader',
+      RequestMethod: 'POST',
+      RequestURL: base + '/upload',
+      Headers: {'X-API-Key': apiKey},
+      Body: 'MultipartFormData',
+      FileFormName: 'file',
+      URL: '{json:url}',
+      DeletionURL: '{json:delete_url}',
+    };
+  }
+
+  /**
+   * Triggers a browser download of a .sxcu file.
+   * @param {!Object} config
+   * @param {string} label
+   */
+  function downloadSxcu(config, label) {
+    const json = JSON.stringify(config, null, 2);
+    const blob = new Blob([json], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'scorpio-' + (label || 'config').replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.sxcu';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  /**
+   * Renders a syntax-highlighted JSON string as HTML.
+   * @param {string} json
+   * @return {string}
+   */
+  function highlightJson(json) {
+    return json
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/("(?:[^"\\]|\\.)*")(\s*:)/g, '<span class="json-key">$1</span><span class="json-punct">$2</span>')
+      .replace(/:\s*("(?:[^"\\]|\\.)*")/g, ': <span class="json-str">$1</span>')
+      .replace(/[{}\[\],]/g, '<span class="json-punct">$&</span>');
+  }
+
+  // -- ShareX modal state --
+
+  let sxcuCurrent = null;
+  let sxcuLabel = '';
+
+  const sharexModal = document.getElementById('sharex-modal');
+
+  function openSharexModal(config, label) {
+    sxcuCurrent = config;
+    sxcuLabel = label;
+    document.getElementById('sharex-modal-label').textContent = 'Key: ' + label;
+    document.getElementById('sharex-preview').innerHTML = highlightJson(JSON.stringify(config, null, 2));
+    sharexModal.style.display = 'flex';
+  }
+
+  function closeSharexModal() {
+    sharexModal.style.display = 'none';
+    sxcuCurrent = null;
+  }
+
+  document.getElementById('sharex-modal-close').addEventListener('click', closeSharexModal);
+  document.getElementById('sharex-modal-cancel').addEventListener('click', closeSharexModal);
+  sharexModal.addEventListener('click', (e) => { if (e.target === sharexModal) closeSharexModal(); });
+
+  document.getElementById('sharex-download').addEventListener('click', () => {
+    if (sxcuCurrent) downloadSxcu(sxcuCurrent, sxcuLabel);
+  });
+
+  document.getElementById('sharex-copy-json').addEventListener('click', () => {
+    if (sxcuCurrent) copyText(JSON.stringify(sxcuCurrent, null, 2));
+  });
+
+  // -- Reveal key and open ShareX modal --
+
+  async function openSharexForKey(keyId, keyLabel) {
+    try {
+      const res = await authFetch('/api/keys/' + keyId + '/reveal');
+      const data = await res.json();
+      if (!res.ok) { showToast(data.error || 'Failed to reveal key'); return; }
+      const config = buildSxcu(data.key, data.label);
+      openSharexModal(config, data.label || keyLabel);
+    } catch {
+      showToast('Failed to load key');
+    }
+  }
+
+  // ============================================================
+  // Create Key Modal
+  // ============================================================
+
+  const keyCreateModal = document.getElementById('key-create-modal');
+  const keyCreatePanel = document.getElementById('key-create-panel');
+  const keyCreatedPanel = document.getElementById('key-created-panel');
+  let pendingKeyConfig = null;
+  let pendingKeyLabel = '';
+
+  function openCreateKeyModal() {
+    keyCreatePanel.style.display = '';
+    keyCreatedPanel.style.display = 'none';
+    document.getElementById('key-create-label').value = '';
+    document.getElementById('key-create-status').className = 'status';
+    keyCreateModal.style.display = 'flex';
+    setTimeout(() => document.getElementById('key-create-label').focus(), 50);
+  }
+
+  function closeCreateKeyModal() {
+    keyCreateModal.style.display = 'none';
+    pendingKeyConfig = null;
+    pendingKeyLabel = '';
+  }
+
+  document.getElementById('key-create-close').addEventListener('click', closeCreateKeyModal);
+  document.getElementById('key-create-cancel').addEventListener('click', closeCreateKeyModal);
+  keyCreateModal.addEventListener('click', (e) => { if (e.target === keyCreateModal) closeCreateKeyModal(); });
+
+  document.getElementById('key-create-label').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('key-create-submit').click();
+  });
+
+  document.getElementById('key-create-submit').addEventListener('click', async () => {
+    const label = document.getElementById('key-create-label').value.trim() || 'API Key';
+    const statusEl = document.getElementById('key-create-status');
+    try {
+      const res = await authFetch('/api/keys', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({label}),
+      });
+      const data = await res.json();
+      if (!res.ok) { showStatus(statusEl, data.error || 'Failed', false); return; }
+
+      // Show the created key panel
+      pendingKeyLabel = data.label || label;
+      pendingKeyConfig = buildSxcu(data.key, pendingKeyLabel);
+      document.getElementById('key-created-value').textContent = data.key;
+      keyCreatePanel.style.display = 'none';
+      keyCreatedPanel.style.display = '';
+      loadDashboard();
+    } catch {
+      showStatus(statusEl, 'Request failed', false);
+    }
+  });
+
+  document.getElementById('key-created-copy').addEventListener('click', () => {
+    copyText(document.getElementById('key-created-value').textContent);
+  });
+
+  document.getElementById('key-created-sharex').addEventListener('click', () => {
+    if (pendingKeyConfig) downloadSxcu(pendingKeyConfig, pendingKeyLabel);
+  });
+
+  document.getElementById('key-created-done').addEventListener('click', () => {
+    closeCreateKeyModal();
+  });
+
+  // ============================================================
+  // Dashboard
+  // ============================================================
 
   async function loadDashboard() {
     // Pre-populate profile from cache
@@ -116,7 +293,6 @@
         throw new Error(data.error);
       }
 
-      // Update stored user with fresh role
       setAuth(getToken(), data.user);
 
       // Topbar
@@ -153,7 +329,7 @@
       // API Keys
       const keysList = document.getElementById('dash-keys-list');
       if (data.api_keys.length === 0) {
-        keysList.innerHTML = '<div class="empty-state">No API keys yet</div>';
+        keysList.innerHTML = '<div class="empty-state">No API keys yet — create one to start uploading</div>';
       } else {
         keysList.innerHTML = data.api_keys.map(k => `
           <div class="key-item">
@@ -162,9 +338,20 @@
               <span class="key-preview">${escapeHtml(k.key_preview)}</span>
               ${k.created_at ? '<span class="key-date">' + formatDate(k.created_at) + '</span>' : ''}
             </div>
+            <button class="btn-sxcu" data-sharex-key="${k.id}" data-sharex-label="${escapeHtml(k.label)}" title="Generate ShareX config">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              ShareX
+            </button>
             <button class="btn-danger" data-delete-key="${k.id}">Delete</button>
           </div>
         `).join('');
+
+        keysList.querySelectorAll('[data-sharex-key]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            openSharexForKey(btn.dataset.sharexKey, btn.dataset.sharexLabel);
+          });
+        });
+
         keysList.querySelectorAll('[data-delete-key]').forEach(btn => {
           btn.addEventListener('click', async () => {
             if (!confirm('Delete this API key?')) return;
@@ -248,27 +435,13 @@
     }
   }
 
-  // -- Create API Key --
+  // -- Create API Key button --
 
-  document.getElementById('dash-create-key').addEventListener('click', async () => {
-    const label = prompt('Label for new API key:', 'API Key');
-    if (label === null) return;
-    try {
-      const res = await authFetch('/api/keys', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({label: label || 'API Key'}),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      prompt('Your new API key (copy it now, it won\'t be shown again):', data.key);
-      loadDashboard();
-    } catch (err) {
-      showToast(err.message);
-    }
-  });
+  document.getElementById('dash-create-key').addEventListener('click', openCreateKeyModal);
 
-  // -- Admin User Management --
+  // ============================================================
+  // Admin User Management
+  // ============================================================
 
   async function loadAdminUsers() {
     try {
@@ -291,8 +464,8 @@
         return `
           <div class="user-row">
             <div class="user-info">
-              <div class="user-name">${escapeHtml(u.username)}${isSelf ? ' <span style="color:#555">(you)</span>' : ''}</div>
-              <div class="user-meta">${u.files} files \u00B7 ${u.api_keys} keys \u00B7 ${u.created_at}</div>
+              <div class="user-name">${escapeHtml(u.username)}${isSelf ? ' <span style="color:var(--text-dim)">(you)</span>' : ''}</div>
+              <div class="user-meta">${u.files} files &middot; ${u.api_keys} keys &middot; ${u.created_at}</div>
             </div>
             <select data-role-user="${u.id}" ${isSelf ? 'disabled' : ''}>${roleOptions}</select>
             ${isSelf ? '' : '<button class="btn-danger" data-delete-user="' + u.id + '">Delete</button>'}
@@ -324,13 +497,8 @@
           if (!confirm('Delete this user and all their data?')) return;
           const id = btn.dataset.deleteUser;
           const r = await authFetch('/api/admin/users/' + id, {method: 'DELETE'});
-          if (r.ok) {
-            showToast('User deleted');
-            loadAdminUsers();
-          } else {
-            const d = await r.json();
-            showToast(d.error || 'Failed');
-          }
+          if (r.ok) { showToast('User deleted'); loadAdminUsers(); }
+          else { const d = await r.json(); showToast(d.error || 'Failed'); }
         });
       });
     } catch (err) {
@@ -338,7 +506,6 @@
     }
   }
 
-  // Load dashboard on init
   loadDashboard();
 
 })();

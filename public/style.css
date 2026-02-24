@@ -1522,6 +1522,111 @@ textarea {
 }
 
 /* ============================================================
+   ShareX / Key modals
+   ============================================================ */
+
+.modal-desc {
+  font-size: .8rem;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.modal-warn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .78rem;
+  color: var(--warning);
+  background: rgba(245, 158, 11, .08);
+  border: 1px solid rgba(245, 158, 11, .2);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  margin-bottom: 14px;
+}
+
+.key-reveal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(34, 211, 238, .05);
+  border: 1px solid rgba(34, 211, 238, .18);
+  border-radius: var(--r-md);
+  padding: 10px 12px;
+  margin-bottom: 16px;
+}
+
+.key-reveal code {
+  flex: 1;
+  font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+  font-size: .78rem;
+  color: var(--accent);
+  word-break: break-all;
+  letter-spacing: .04em;
+  line-height: 1.5;
+}
+
+.sxcu-preview {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px;
+  margin-bottom: 16px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.sxcu-preview pre {
+  font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+  font-size: .74rem;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.sxcu-preview .json-key   { color: var(--accent); }
+.sxcu-preview .json-str   { color: #86efac; }
+.sxcu-preview .json-punct { color: var(--text-dim); }
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+/* ShareX button in key row */
+.btn-sxcu {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  background: rgba(129, 140, 248, .1);
+  border: 1px solid rgba(129, 140, 248, .2);
+  color: var(--accent2);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--t);
+  flex-shrink: 0;
+}
+
+.btn-sxcu:hover {
+  background: rgba(129, 140, 248, .18);
+  border-color: rgba(129, 140, 248, .4);
+}
+
+.btn-sxcu svg {
+  width: 11px;
+  height: 11px;
+}
+
+/* ============================================================
    Upload result in panel
    ============================================================ */
 

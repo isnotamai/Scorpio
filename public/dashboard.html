@@ -137,6 +137,65 @@
   </footer>
 </div>
 
+<!-- Create Key Modal -->
+<div class="modal-overlay" id="key-create-modal" style="display:none">
+  <div class="modal" id="key-create-panel">
+    <button class="modal-close" id="key-create-close">&times;</button>
+    <h2 class="modal-title">New API Key</h2>
+    <div class="field">
+      <label for="key-create-label">Label</label>
+      <input type="text" id="key-create-label" placeholder="e.g. ShareX, Home PC" maxlength="64" autocomplete="off">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="key-create-submit">Create Key</button>
+      <button class="btn btn-secondary" id="key-create-cancel">Cancel</button>
+    </div>
+    <div class="status" id="key-create-status"></div>
+  </div>
+
+  <!-- Created success panel (hidden initially) -->
+  <div class="modal" id="key-created-panel" style="display:none">
+    <h2 class="modal-title">Key Created</h2>
+    <div class="modal-warn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Save this key — it will not be shown again.
+    </div>
+    <div class="key-reveal">
+      <code id="key-created-value"></code>
+      <button class="icon-btn" id="key-created-copy" title="Copy key">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      </button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="key-created-sharex">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download .sxcu
+      </button>
+      <button class="btn btn-secondary" id="key-created-done">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ShareX Config Modal -->
+<div class="modal-overlay" id="sharex-modal" style="display:none">
+  <div class="modal" style="max-width:480px">
+    <button class="modal-close" id="sharex-modal-close">&times;</button>
+    <h2 class="modal-title">ShareX Configuration</h2>
+    <p class="modal-desc" id="sharex-modal-label"></p>
+    <div class="sxcu-preview">
+      <pre id="sharex-preview"></pre>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="sharex-download">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download .sxcu
+      </button>
+      <button class="btn btn-secondary" id="sharex-copy-json">Copy JSON</button>
+      <button class="btn btn-secondary" id="sharex-modal-cancel">Close</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast">Copied!</div>
 
 <script src="/dashboard.js"></script>

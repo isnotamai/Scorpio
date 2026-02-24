@@ -66,6 +66,16 @@ router.post('/keys', keysLimiter, authenticateSession, (req, res) => {
   res.json({ success: true, key, label: keyLabel });
 });
 
+router.get('/keys/:id/reveal', authenticateSession, (req, res) => {
+  const keyId = parseInt(req.params.id, 10);
+  if (isNaN(keyId)) { res.status(400).json({ error: 'Invalid key ID' }); return; }
+  const keyRow = db.getApiKeyById(keyId);
+  if (!keyRow || keyRow.user_id !== req.user.id) {
+    res.status(404).json({ error: 'API key not found' }); return;
+  }
+  res.json({ key: keyRow.key, label: keyRow.label });
+});
+
 router.delete('/keys/:id', authenticateSession, (req, res) => {
   const keyId = parseInt(req.params.id, 10);
   if (isNaN(keyId)) { res.status(400).json({ error: 'Invalid key ID' }); return; }
