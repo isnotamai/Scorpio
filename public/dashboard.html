@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Scorpio</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-brand">
+      <img class="logo" src="/logo.png" alt="Scorpio">
+      <h1>Scorpio</h1>
+      <span class="topbar-tag">DASHBOARD</span>
+    </div>
+    <div class="topbar-auth">
+      <div class="auth-logged-in" style="display:flex">
+        <span class="auth-user" id="auth-username"></span>
+        <span class="auth-role-badge" id="auth-role-badge"></span>
+        <span class="auth-quota" id="auth-quota"></span>
+        <a href="/" class="btn btn-sm btn-secondary">Tools</a>
+        <button class="btn btn-sm btn-secondary" id="btn-logout">Logout</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="app app--wide">
+
+  <div class="tool-body dash-body" style="margin-top:24px">
+
+    <div class="dash-layout">
+
+      <!-- ===== Sidebar ===== -->
+      <div class="dash-sidebar">
+
+        <div class="dash-profile">
+          <div class="dash-avatar" id="dash-avatar">?</div>
+          <div class="dash-profile-name" id="dash-profile-name">—</div>
+          <span class="auth-role-badge" id="dash-role-badge"></span>
+        </div>
+
+        <div class="dash-stats">
+          <div class="dash-stat-card">
+            <div class="dash-stat-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="dash-stat-info">
+              <div class="dash-stat-value" id="dash-stat-files">0</div>
+              <div class="dash-stat-label">Files</div>
+            </div>
+          </div>
+          <div class="dash-stat-card">
+            <div class="dash-stat-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div class="dash-stat-info">
+              <div class="dash-stat-value" id="dash-stat-keys">0</div>
+              <div class="dash-stat-label">API Keys</div>
+            </div>
+          </div>
+          <div class="dash-stat-card">
+            <div class="dash-stat-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+            </div>
+            <div class="dash-stat-info">
+              <div class="dash-stat-value" id="dash-stat-usage">0%</div>
+              <div class="dash-stat-label">Quota Used</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-section">
+          <div class="dash-section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+            <span>Upload Quota</span>
+          </div>
+          <div class="quota-bar-container">
+            <div class="quota-bar">
+              <div class="quota-bar-fill" id="dash-quota-fill" style="width:0%"></div>
+            </div>
+            <div class="quota-text" id="dash-quota-text">0 / 10</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== Main ===== -->
+      <div class="dash-main">
+
+        <div class="dash-section">
+          <div class="dash-section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>API Keys</span>
+            <button class="btn btn-sm btn-primary" id="dash-create-key">+ New Key</button>
+          </div>
+          <div id="dash-keys-list"></div>
+        </div>
+
+        <div class="dash-section">
+          <div class="dash-section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Uploaded Files</span>
+            <span class="dash-file-count" id="dash-file-count"></span>
+          </div>
+          <div id="dash-files-list" class="dash-files-grid"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Admin Panel (hidden for non-admins) -->
+    <div id="admin-panel" style="display:none">
+      <div class="dash-section dash-section--admin">
+        <div class="dash-section-title dash-section-title--admin">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>User Management</span>
+        </div>
+        <div id="admin-users-list"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <div class="footer-line"></div>
+    <div class="footer-content">
+      <span class="footer-brand">SCORPIO</span>
+      <span class="footer-dot">&middot;</span>
+      <span class="footer-text">SYS.ONLINE</span>
+    </div>
+  </footer>
+
+</div>
+
+<div class="toast" id="toast">Copied!</div>
+
+<script src="/dashboard.js"></script>
+</body>
+</html>
