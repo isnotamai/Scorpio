@@ -42,6 +42,11 @@ app.use('/api', userRouter);
 app.use('/api/admin', adminRoutes);
 app.use('/', fileRoutes);
 
+// Favicon (for Google S2 and browsers that request /favicon.ico)
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'logo.png'));
+});
+
 // Dashboard
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));

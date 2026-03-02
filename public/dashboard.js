@@ -427,6 +427,7 @@
       if (data.user.role === 'admin') {
         adminPanel.style.display = 'block';
         loadAdminUsers();
+        loadAdminSettings();
       } else {
         adminPanel.style.display = 'none';
       }
@@ -498,6 +499,71 @@
           const id = btn.dataset.deleteUser;
           const r = await authFetch('/api/admin/users/' + id, {method: 'DELETE'});
           if (r.ok) { showToast('User deleted'); loadAdminUsers(); }
+          else { const d = await r.json(); showToast(d.error || 'Failed'); }
+        });
+      });
+    } catch (err) {
+      showToast(err.message);
+    }
+  }
+
+  // ============================================================
+  // Admin Role Settings
+  // ============================================================
+
+  function mbToBytes(mb) { return Math.round(parseFloat(mb) * 1024 * 1024); }
+  function bytesToMb(bytes) { return (bytes / (1024 * 1024)).toFixed(0); }
+
+  async function loadAdminSettings() {
+    try {
+      const res = await authFetch('/api/admin/settings');
+      const data = await res.json();
+      if (!res.ok) return;
+
+      const container = document.getElementById('admin-settings-list');
+      const roleLabels = {admin: 'Admin', pro: 'Pro', user: 'User'};
+
+      container.innerHTML = `
+        <div class="settings-grid">
+          <div class="settings-header">
+            <span>Role</span>
+            <span>File Quota <small>(−1 = unlimited)</small></span>
+            <span>Max File Size (MB)</span>
+            <span></span>
+          </div>
+          ${data.roles.map(role => {
+            const quota = data.quotas[role];
+            const maxMb = bytesToMb(data.max_sizes[role]);
+            return `
+              <div class="settings-row" data-settings-role="${escapeHtml(role)}">
+                <span class="auth-role-badge role-${escapeHtml(role)}">${escapeHtml(roleLabels[role] || role)}</span>
+                <input class="settings-input" type="number" data-field="quota" value="${quota}" min="-1" step="1" placeholder="-1 = unlimited">
+                <input class="settings-input" type="number" data-field="max_size_mb" value="${maxMb}" min="1" step="1" placeholder="MB">
+                <button class="btn btn-sm btn-primary settings-save" data-role="${escapeHtml(role)}">Save</button>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+
+      container.querySelectorAll('.settings-save').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const role = btn.dataset.role;
+          const row = container.querySelector('[data-settings-role="' + role + '"]');
+          const quotaVal = parseInt(row.querySelector('[data-field="quota"]').value, 10);
+          const maxMbVal = parseFloat(row.querySelector('[data-field="max_size_mb"]').value);
+          if (isNaN(quotaVal) || (quotaVal !== -1 && quotaVal < 0)) {
+            showToast('Quota must be -1 or positive'); return;
+          }
+          if (isNaN(maxMbVal) || maxMbVal < 1) {
+            showToast('Max size must be >= 1 MB'); return;
+          }
+          const r = await authFetch('/api/admin/settings', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({role, quota: quotaVal, max_size: mbToBytes(maxMbVal)}),
+          });
+          if (r.ok) { showToast('Saved — ' + role); }
           else { const d = await r.json(); showToast(d.error || 'Failed'); }
         });
       });

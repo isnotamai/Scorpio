@@ -12,6 +12,8 @@ const {generateToken, formatBytes} = require('../utils');
 const {authenticateSession, authenticateUploadRequest} = require('../middleware/auth');
 const {BASE_URL, ALLOWED_TYPES, VIDEO_EXTS, ROLE_QUOTAS} = require('../config');
 
+const DEFAULT_MAX_SIZE = 500 * 1024 * 1024; // 500 MB
+
 const router = express.Router();
 
 /** @const {string} */
@@ -30,12 +32,24 @@ const uploadLimiter = rateLimit({
 });
 
 /**
- * Returns the upload quota for a user role.
+ * Returns the upload quota (file count) for a user role, from DB or config default.
  * @param {string} role
  * @return {number}
  */
 function getQuota(role) {
+  const stored = db.getSetting('quota_' + role);
+  if (stored !== null) return parseInt(stored, 10);
   return ROLE_QUOTAS[role] !== undefined ? ROLE_QUOTAS[role] : ROLE_QUOTAS.user;
+}
+
+/**
+ * Returns the max file size in bytes for a user role, from DB or default.
+ * @param {string} role
+ * @return {number}
+ */
+function getMaxFileSize(role) {
+  const stored = db.getSetting('max_size_' + role);
+  return stored !== null ? parseInt(stored, 10) : DEFAULT_MAX_SIZE;
 }
 
 /**
@@ -81,7 +95,7 @@ router.post('/upload', uploadLimiter, authenticateUploadRequest, (req, res, next
   const form = formidable({
     uploadDir: UPLOADS_DIR,
     keepExtensions: true,
-    maxFileSize: 500 * 1024 * 1024,
+    maxFileSize: getMaxFileSize(role),
     maxFiles: 1,
     filename(name, ext) { return `${nanoid(10)}${ext}`; },
     filter({mimetype, originalFilename}) {

@@ -51,6 +51,11 @@ db.exec(`
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
+  CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  );
+
   CREATE INDEX IF NOT EXISTS idx_api_keys_key ON api_keys(key);
   CREATE INDEX IF NOT EXISTS idx_files_filename ON files(filename);
   CREATE INDEX IF NOT EXISTS idx_files_delete_token ON files(delete_token);
@@ -148,6 +153,12 @@ const stmtCleanExpiredSessions = db.prepare(
   'DELETE FROM sessions WHERE expires_at <= datetime(\'now\')'
 );
 
+// -- Settings --
+
+const stmtGetSetting = db.prepare('SELECT value FROM settings WHERE key = ?');
+const stmtSetSetting = db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+const stmtGetAllSettings = db.prepare('SELECT key, value FROM settings');
+
 // Clean expired sessions on startup
 stmtCleanExpiredSessions.run();
 
@@ -216,6 +227,21 @@ module.exports = {
   },
   countFilesByUser(userId) {
     return stmtCountFilesByUser.get(userId).count;
+  },
+
+  // Settings
+  getSetting(key) {
+    const row = stmtGetSetting.get(key);
+    return row ? row.value : null;
+  },
+  setSetting(key, value) {
+    return stmtSetSetting.run(key, String(value));
+  },
+  getAllSettings() {
+    const rows = stmtGetAllSettings.all();
+    const result = {};
+    for (const row of rows) result[row.key] = row.value;
+    return result;
   },
 
   // Sessions

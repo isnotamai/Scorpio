@@ -5,6 +5,8 @@ const db = require('../../db');
 const { authenticateSession, requireAdmin } = require('../middleware/auth');
 const { ROLE_QUOTAS } = require('../config');
 
+const DEFAULT_MAX_SIZE = 500 * 1024 * 1024; // 500 MB
+
 const router = express.Router();
 
 router.get('/users', authenticateSession, requireAdmin, (req, res) => {
@@ -44,6 +46,43 @@ router.delete('/users/:id', authenticateSession, requireAdmin, (req, res) => {
   const target = db.getUserById(userId);
   if (!target) { res.status(404).json({ error: 'User not found' }); return; }
   db.deleteUser(userId);
+  res.json({ success: true });
+});
+
+// -- Role Settings --
+
+router.get('/settings', authenticateSession, requireAdmin, (req, res) => {
+  const roles = Object.keys(ROLE_QUOTAS);
+  const quotas = {};
+  const max_sizes = {};
+  for (const role of roles) {
+    const q = db.getSetting('quota_' + role);
+    quotas[role] = q !== null ? parseInt(q, 10) : ROLE_QUOTAS[role];
+    const s = db.getSetting('max_size_' + role);
+    max_sizes[role] = s !== null ? parseInt(s, 10) : DEFAULT_MAX_SIZE;
+  }
+  res.json({ roles, quotas, max_sizes });
+});
+
+router.put('/settings', authenticateSession, requireAdmin, (req, res) => {
+  const { role, quota, max_size } = req.body || {};
+  if (!role || !Object.prototype.hasOwnProperty.call(ROLE_QUOTAS, role)) {
+    res.status(400).json({ error: 'Invalid role' }); return;
+  }
+  if (quota !== undefined) {
+    const q = parseInt(quota, 10);
+    if (isNaN(q) || (q !== -1 && q < 0)) {
+      res.status(400).json({ error: 'quota must be -1 (unlimited) or a positive integer' }); return;
+    }
+    db.setSetting('quota_' + role, q);
+  }
+  if (max_size !== undefined) {
+    const s = parseInt(max_size, 10);
+    if (isNaN(s) || s < 1) {
+      res.status(400).json({ error: 'max_size must be a positive integer (bytes)' }); return;
+    }
+    db.setSetting('max_size_' + role, s);
+  }
   res.json({ success: true });
 });
 

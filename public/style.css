@@ -1522,6 +1522,66 @@ textarea {
 }
 
 /* ============================================================
+   Role Settings Grid
+   ============================================================ */
+
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-header {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr 70px;
+  gap: 10px;
+  padding: 6px 12px;
+  font-size: .65rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  align-items: center;
+}
+
+.settings-header small {
+  font-size: .6rem;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 400;
+  opacity: .7;
+}
+
+.settings-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr 70px;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-input);
+}
+
+.settings-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-bright);
+  font-size: .78rem;
+  font-family: inherit;
+  padding: 5px 8px;
+  outline: none;
+  transition: border-color var(--t), box-shadow var(--t);
+}
+
+.settings-input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, .08);
+}
+
+/* ============================================================
    ShareX / Key modals
    ============================================================ */
 
